@@ -40,7 +40,6 @@
       flex-direction: column;
     }
 
-    /* Общие стили для анимаций */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
@@ -54,16 +53,14 @@
     /* ==========================================================
        1. СТИЛИ ЛЕНДИНГА (servis-kontrol.ru без ID)
        ========================================================== */
-    
     #landing-page {
-      display: none; /* Скрыт по умолчанию */
+      display: none;
       flex-direction: column;
       align-items: center;
       width: 100%;
       padding-bottom: 50px;
     }
 
-    /* Шапка */
     .header {
       width: 100%;
       max-width: 1200px;
@@ -95,7 +92,7 @@
     }
 
     .nav-btn {
-      background: rgba(255,255,255,0.05);
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
       color: var(--text);
       padding: 8px 16px;
@@ -105,9 +102,11 @@
       text-decoration: none;
       transition: all 0.2s;
     }
-    .nav-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
 
-    /* Главная секция */
     .hero {
       max-width: 800px;
       text-align: center;
@@ -141,10 +140,9 @@
       color: var(--text-muted);
       line-height: 1.6;
       margin-bottom: 40px;
-      max-width: 600px;
+      max-width: 640px;
     }
 
-    /* Кнопки */
     .btn-main {
       background: var(--accent-grad);
       color: #0f172a;
@@ -161,12 +159,11 @@
     }
 
     .btn-main:hover {
-      opacity: 0.9;
+      opacity: 0.95;
       transform: translateY(-2px);
       box-shadow: 0 12px 24px -5px rgba(56, 189, 248, 0.5);
     }
 
-    /* Сетка преимуществ */
     .features {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -191,13 +188,16 @@
     .l-card:hover {
       border-color: rgba(56, 189, 248, 0.3);
       transform: translateY(-3px);
-      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
     }
 
     .l-card::before {
       content: '';
       position: absolute;
-      bottom: 0; left: 0; width: 100%; height: 2px;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
       background: var(--accent-grad);
       opacity: 0;
       transition: opacity 0.3s;
@@ -230,7 +230,6 @@
       line-height: 1.6;
     }
 
-    /* Демо-секция */
     .demo-section {
       width: 100%;
       max-width: 1100px;
@@ -239,7 +238,7 @@
     }
 
     .demo-container {
-      background: rgba(0,0,0,0.2);
+      background: rgba(0, 0, 0, 0.2);
       border: 1px solid var(--border);
       border-radius: 24px;
       padding: 20px;
@@ -251,18 +250,17 @@
     }
     
     .demo-container::after {
-        content:'ДЕМО-ЗОНА';
-        position: absolute;
-        top: -10px;
-        background: #090d16;
-        padding: 0 10px;
-        font-size: 10px;
-        font-weight: 700;
-        color: var(--accent);
-        letter-spacing: 1px;
+      content: 'ДЕМО-ЗОНА';
+      position: absolute;
+      top: -10px;
+      background: #090d16;
+      padding: 0 10px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1px;
     }
 
-    /* Адаптивность лендинга */
     @media (max-width: 768px) {
       .hero h1 { font-size: 34px; letter-spacing: -1px; }
       .hero p { font-size: 16px; }
@@ -270,11 +268,10 @@
     }
 
     /* ==========================================================
-       2. ВОССТАНОВЛЕННЫЕ СТИЛИ ВИДЖЕТА (servis-kontrol.ru?id=...)
+       2. СТИЛИ ВИДЖЕТА ОТЗЫВОВ (servis-kontrol.ru?id=...)
        ========================================================== */
-    
     #widget-page {
-      display: none; /* Скрыт по умолчанию */
+      display: none;
       justify-content: center;
       align-items: center;
       padding: 20px 16px;
@@ -382,7 +379,7 @@
       stroke: #334155;
       stroke-width: 1.5;
       transition: all 0.25s ease;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
     }
 
     .star-btn.active .star-icon {
@@ -577,10 +574,10 @@
 
   <section class="hero">
     <h1>Честные отзывы<br>для <span>Вашего бизнеса</span></h1>
-    <p>NFC-стойки и QR-коды, которые фильтруют негатив. Получайте 5 звёзд на карты, а жалобы — напрямую в Telegram директора.</p>
+    <p>NFC-стойки и QR-коды, которые фильтруют негатив. Получайте 5 звёзд на карты, а жалобы — напрямую в Telegram, VK или на почту директора.</p>
     <a href="https://t.me/your_manager" class="btn-main">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-      Подключить тариф
+      Подключить систему
     </a>
   </section>
 
@@ -591,7 +588,7 @@
       <p>Просим довольных клиентов оставить отзыв на Яндекс.Картах, Google или 2ГИС.</p>
     </div>
     <div class="l-card">
-      <div class="icon-box">🤫</div>
+      <div class="icon-box">🛡️</div>
       <h3>Перехват негатива</h3>
       <p>Если клиенту не понравилось, форма предложит написать директору, а не на карты.</p>
     </div>
@@ -610,19 +607,15 @@
       <h2>Простая механика</h2>
       <p style="color:var(--text-muted); margin-top:10px;">Нажмите на звёзды в виджете ниже, чтобы проверить сценарии (4-5 звёзд — карты, 1-3 — форма жалобы)</p>
       
-      <div class="demo-container">
-          <!-- Сюда скрипт вставит клон виджета для демо -->
-      </div>
+      <div class="demo-container"></div>
   </section>
-
 </div>
 
 <!-- ==========================================================
-     БЛОК 2: ВОССТАНОВЛЕННЫЙ ВИДЖЕТ (с ID)
+     БЛОК 2: ВИДЖЕТ ОТЗЫВОВ (servis-kontrol.ru?id=...)
      ========================================================== -->
 <div id="widget-page">
   <div class="widget-card" id="widgetCard">
-    <!-- Основной экран -->
     <div id="mainFields">
       <div id="headerBox">
         <div class="top-badge">
@@ -655,8 +648,6 @@
       </div>
     </div>
 
-    <!-- Экраны состояний (скрыты) -->
-    
     <!-- Перенаправление -->
     <div class="status-screen" id="redirectBlock">
       <div class="spinner"></div>
@@ -700,18 +691,15 @@
 </div>
 
 <script>
-  // Основная логика роутинга и инициализации виджета
   const GIST_ID = "052f7c277f6e1fc78a305e81e2135f65";
   const urlParams = new URLSearchParams(window.location.search);
   const shopId = urlParams.get('id');
 
-  // Элементы страниц
   const landingPage = document.getElementById('landing-page');
   const widgetPage = document.getElementById('widget-page');
   const demoContainer = document.querySelector('.demo-container');
   const widgetCardMaster = document.getElementById('widgetCard');
 
-  // ЛЕЙБЛЫ ОЦЕНОК (восстановлены)
   const ratingLabels = {
     1: "😡 Ужасный сервис",
     2: "🙁 Не понравилось",
@@ -722,36 +710,29 @@
 
   // 1. РОУТИНГ: Лендинг или Виджет
   if (!shopId) {
-    // Показываем лендинг
     landingPage.style.display = 'flex';
     document.title = "Сервис Контроль — Подключение бизнеса";
     
-    // Создаем ДЕМО-версию виджета внутри лендинга
+    // Демо-виджет внутри лендинга
     const demoWidget = widgetCardMaster.cloneNode(true);
     demoWidget.id = "demoWidgetCard";
-    // Убираем outline т.к. стиль лендинга немного другой
     demoWidget.style.outline = 'none'; 
     demoWidget.style.boxShadow = 'none';
     demoWidget.style.background = 'transparent';
     demoContainer.appendChild(demoWidget);
     
-    // Инициализируем логику для демо-виджета
     initWidgetLogic(demoWidget, true);
-
   } else {
-    // Показываем реальный виджет
     widgetPage.style.display = 'flex';
     initWidgetLogic(widgetCardMaster, false, shopId);
   }
 
-
-  // 2. ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ ЛОГИКИ ВИДЖЕТА (универсальная для демо и реала)
+  // 2. УНИВЕРСАЛЬНАЯ ЛОГИКА ВИДЖЕТА
   function initWidgetLogic(cardEl, isDemo = false, id = null) {
     let shopConfig = null;
     let selectedRating = 0;
     let selectedTags = [];
 
-    // Элементы внутри конкретной карточки (cardEl)
     const shopNameEl = cardEl.querySelector('#shopName');
     const ratingBox = cardEl.querySelector('#ratingBox');
     const headerBox = cardEl.querySelector('#headerBox');
@@ -768,7 +749,6 @@
     const btnSend = cardEl.querySelector('#btnSend');
     const successBlock = cardEl.querySelector('#successBlock');
 
-    // Загрузка конфига (только если не демо)
     if (!isDemo && id) {
       fetch(`https://api.github.com/gists/${GIST_ID}`)
         .then(r => r.json())
@@ -782,45 +762,39 @@
         })
         .catch(err => console.error("Ошибка загрузки точки:", err));
     } else if (isDemo) {
-        shopNameEl.innerText = "Демо-заведение";
-        // Хардкодим ссылки для демо
-        shopConfig = {
-            name: "Демо-заведение",
-            yandex_url: "https://ya.ru",
-            gis_url: "https://2gis.ru"
-        }
+      shopNameEl.innerText = "Демо-заведение";
+      shopConfig = {
+        name: "Демо-заведение",
+        yandex_url: "https://ya.ru",
+        gis_url: "https://2gis.ru"
+      };
     }
 
-    // Логика звёзд (восстановлена полностью)
     starsButtons.forEach((btn, idx) => {
       btn.addEventListener('click', () => {
         selectedRating = idx + 1;
         
-        // Обновляем пилюлю текста
         ratingTextPill.innerText = ratingLabels[selectedRating];
         ratingTextPill.style.color = selectedRating >= 4 ? '#38bdf8' : '#fda4af';
         ratingTextPill.style.background = selectedRating >= 4 ? 'rgba(56,189,248,0.1)' : 'rgba(244,63,94,0.1)';
 
-        // Визуализация звёзд
         starsButtons.forEach((b, i) => {
           b.classList.toggle('active', i <= idx);
         });
 
-        // Сценарии
         if (selectedRating >= 4) {
-          // ПОЗИТИВ (4-5)
           ratingBox.style.display = 'none';
-          negativeForm.style.display = 'none'; // На всякий случай скрываем форму если была
+          negativeForm.style.display = 'none';
 
           if (isDemo) {
-              headerBox.style.display = 'none';
-              btnYandex.href = shopConfig.yandex_url;
-              btn2Gis.href = shopConfig.gis_url;
-              chooseMapBlock.style.display = 'block';
-              return;
+            headerBox.style.display = 'none';
+            btnYandex.href = shopConfig.yandex_url;
+            btn2Gis.href = shopConfig.gis_url;
+            chooseMapBlock.style.display = 'block';
+            return;
           }
 
-          if (!shopConfig) return; // Ждем загрузки конфига
+          if (!shopConfig) return;
 
           headerBox.style.display = 'none';
           const yaUrl = shopConfig.yandex_url || shopConfig.maps_url;
@@ -836,7 +810,6 @@
             setTimeout(() => { window.location.href = targetUrl; }, 1000);
           }
         } else {
-          // НЕГАТИВ (1-3)
           chooseMapBlock.style.display = 'none';
           redirectBlock.style.display = 'none';
           negativeForm.style.display = 'block';
@@ -844,60 +817,57 @@
       });
     });
 
-    // Логика тегов (восстановлена)
     tagsItems.forEach(tag => {
-        tag.addEventListener('click', () => {
-            tag.classList.toggle('selected');
-            const text = tag.innerText;
-            if (selectedTags.includes(text)) {
-                selectedTags = selectedTags.filter(t => t !== text);
-            } else {
-                selectedTags.push(text);
-            }
-        });
+      tag.addEventListener('click', () => {
+        tag.classList.toggle('selected');
+        const text = tag.innerText;
+        if (selectedTags.includes(text)) {
+          selectedTags = selectedTags.filter(t => t !== text);
+        } else {
+          selectedTags.push(text);
+        }
+      });
     });
 
-    // Логика отправки (восстановлена)
     if (btnSend) {
-        btnSend.addEventListener('click', async () => {
-            const comment = cardEl.querySelector('#comment').value.trim();
-            const phone = cardEl.querySelector('#phone').value.trim();
+      btnSend.addEventListener('click', async () => {
+        const comment = cardEl.querySelector('#comment').value.trim();
+        const phone = cardEl.querySelector('#phone').value.trim();
 
-            if (isDemo) {
-                // В демо просто показываем успех
-                headerBox.style.display = 'none';
-                ratingBox.style.display = 'none';
-                negativeForm.style.display = 'none';
-                successBlock.style.display = 'block';
-                return;
-            }
+        if (isDemo) {
+          headerBox.style.display = 'none';
+          ratingBox.style.display = 'none';
+          negativeForm.style.display = 'none';
+          successBlock.style.display = 'block';
+          return;
+        }
 
-            // Реальная отправка
-            btnSend.disabled = true;
-            btnSend.innerText = "Отправка...";
+        btnSend.disabled = true;
+        btnSend.innerText = "Отправка...";
 
-            try {
-                await fetch('/api/send', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        shopId: id,
-                        rating: selectedRating,
-                        tags: selectedTags,
-                        comment: comment,
-                        phone: phone
-                    })
-                });
-            } catch (e) { console.error("Сетевая ошибка:", e); }
+        try {
+          await fetch('/api/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              shopId: id,
+              rating: selectedRating,
+              tags: selectedTags,
+              comment: comment,
+              phone: phone
+            })
+          });
+        } catch (e) {
+          console.error("Сетевая ошибка:", e);
+        }
 
-            headerBox.style.display = 'none';
-            ratingBox.style.display = 'none';
-            negativeForm.style.display = 'none';
-            successBlock.style.display = 'block';
-        });
+        headerBox.style.display = 'none';
+        ratingBox.style.display = 'none';
+        negativeForm.style.display = 'none';
+        successBlock.style.display = 'block';
+      });
     }
   }
 </script>
-
 </body>
 </html>
