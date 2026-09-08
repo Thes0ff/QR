@@ -33,7 +33,7 @@ export default async function handler(req, res) {
 
     const requests = [];
 
-    // 2. Отправка в Telegram (если указан)
+    // 2. Отправка в Telegram
     if (shop.targets?.telegram && TG_BOT_TOKEN) {
       requests.push(
         fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
@@ -44,10 +44,11 @@ export default async function handler(req, res) {
       );
     }
 
-    // 3. Отправка в VK (напрямую, без JSONP)
+    // 3. Отправка в VK
     if (shop.targets?.vk && VK_GROUP_TOKEN) {
+      const cleanVkId = String(shop.targets.vk).replace(/\D/g, '');
       const params = new URLSearchParams({
-        user_id: shop.targets.vk,
+        user_id: cleanVkId,
         message: text,
         random_id: Math.floor(Math.random() * 10000000),
         access_token: VK_GROUP_TOKEN,
@@ -66,11 +67,14 @@ export default async function handler(req, res) {
       requests.push(
         fetch('https://api.web3forms.com/submit', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
           body: JSON.stringify({
             access_key: WEB3FORMS_KEY,
-            to: shop.targets.email,
-            subject: `Жалоба: ${shopName}`,
+            from_name: "Служба контроля качества",
+            subject: `🚨 Жалоба: ${shopName}`,
             message: text
           })
         })
