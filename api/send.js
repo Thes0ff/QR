@@ -1,5 +1,4 @@
 module.exports = async function handler(req, res) {
-  // Разрешаем только POST запросы
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -7,13 +6,12 @@ module.exports = async function handler(req, res) {
   try {
     const { shopId, rating, tags, comment, phone } = req.body;
 
-    // Секретные токены из переменных окружения Vercel
     const GIST_ID = process.env.GIST_ID;
     const TG_BOT_TOKEN = process.env.TG_BOT_TOKEN;
     const VK_GROUP_TOKEN = process.env.VK_GROUP_TOKEN;
     const WEB3FORMS_KEY = process.env.WEB3FORMS_KEY;
 
-    // 1. Читаем данные точки из GitHub Gist
+    // 1. Получаем данные точки из GitHub Gist
     const gistRes = await fetch(`https://api.github.com/gists/${GIST_ID}`);
     const gistData = await gistRes.json();
     const shops = JSON.parse(gistData.files['shops.json'].content || '{}');
@@ -62,14 +60,17 @@ module.exports = async function handler(req, res) {
       );
     }
 
-    // 4. Отправка на Email (Web3Forms со всеми обязательными полями)
+    // 4. Отправка на Email (Web3Forms с защитой от сбоев парсера)
     if (shop.targets?.email && WEB3FORMS_KEY) {
       requests.push(
         fetch('https://api.web3forms.com/submit', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Origin': 'https://servis-kontrol.ru',
+            'Referer': 'https://servis-kontrol.ru/'
           },
           body: JSON.stringify({
             access_key: WEB3FORMS_KEY.trim(),
@@ -80,14 +81,20 @@ module.exports = async function handler(req, res) {
           })
         })
         .then(async (r) => {
-          const resJson = await r.json();
-          console.log('=== WEB3FORMS RESPONSE ===:', resJson);
+          const raw = await r.text();
+          console.log('=== WEB3FORMS HTTP STATUS ===:', r.status);
+          try {
+            const data = JSON.parse(raw);
+            console.log('=== WEB3FORMS OK ===:', data);
+          } catch (e) {
+            console.log('=== WEB3FORMS HTML ===:', raw.slice(0, 300));
+          }
         })
-        .catch((err) => console.error('=== WEB3FORMS ERROR ===:', err))
+        .catch((err) => console.error('=== WEB3FORMS NETWORK ERROR ===:', err))
       );
     } else {
-      console.log('Email не отправлен. Причина:', {
-        hasTargetEmail: Boolean(shop.targets?.email),
+      console.log('Email не отправлен:', {
+        hasEmail: Boolean(shop.targets?.email),
         hasKey: Boolean(WEB3FORMS_KEY)
       });
     }
