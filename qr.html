@@ -25,7 +25,7 @@
       color: #f8fafc;
     }
 
-    /* Панель управления перед печатью */
+    /* Панель управления */
     .controls-panel {
       background: #161e2e;
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -118,14 +118,13 @@
       transform: translateY(-1px);
     }
 
-    /* Внешняя рамка с метками обрезки под лист А4 */
+    /* Рамка и макет 10x15 см */
     .cut-wrapper {
       padding: 15px;
       background: transparent;
       position: relative;
     }
 
-    /* Физическая стойка 100 × 150 мм (стандарт 10x15 см под акрил) */
     .stand-card {
       width: 100mm;
       height: 150mm;
@@ -136,10 +135,60 @@
       border-radius: 4px;
       position: relative;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-      outline: 1px dashed #94a3b8; /* Контур для вырезания ножницами */
+      outline: 1px dashed #94a3b8;
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      transition: background 0.3s ease;
+    }
+
+    /* ================= ВСТРОЕННЫЕ ПРЕСЕТЫ ФОНОВ ================= */
+    /* 1. Белый чистый минимализм */
+    .preset-white {
+      background: #ffffff !important;
+    }
+
+    /* 2. Тёплый крафт (Пекарня / Кофейня) */
+    .preset-kraft {
+      background-color: #f7efe3 !important;
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.45) 0%, rgba(224, 207, 184, 0.4) 100%),
+        repeating-linear-gradient(45deg, rgba(160, 120, 80, 0.03) 0px, rgba(160, 120, 80, 0.03) 2px, transparent 2px, transparent 4px) !important;
+    }
+
+    /* 3. Тёмный сланец / Графит (Рестораны / Барбершопы) */
+    .preset-slate {
+      background-color: #12161f !important;
+      background-image: 
+        radial-gradient(circle at 50% 20%, #202736 0%, #10141c 70%, #090b10 100%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 2px) !important;
+    }
+
+    /* 4. Бьюти / Пудровый (Салоны красоты / Косметология) */
+    .preset-beauty {
+      background-color: #fdf5f4 !important;
+      background-image: 
+        radial-gradient(circle at 10% 20%, #fff0ed 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, #fbe4e1 0%, transparent 50%),
+        linear-gradient(135deg, #fffaf9 0%, #faecea 100%) !important;
+    }
+
+    /* 5. Карбон / Dark Tech (Авто / Детейлинг) */
+    .preset-auto {
+      background-color: #0f1217 !important;
+      background-image: 
+        radial-gradient(circle at 50% 30%, rgba(30, 41, 59, 0.8) 0%, rgba(15, 18, 23, 0.95) 100%),
+        radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px) !important;
+      background-size: 100% 100%, 10px 10px !important;
+    }
+
+    /* 6. Ментол / Медицина (Клиники / Аптеки / Стоматологии) */
+    .preset-med {
+      background-color: #f0fdfa !important;
+      background-image: 
+        radial-gradient(circle at 80% 10%, #ccfbf1 0%, transparent 50%),
+        radial-gradient(circle at 20% 90%, #e6fffa 0%, transparent 50%),
+        linear-gradient(180deg, #ffffff 0%, #f0fdfa 100%) !important;
     }
 
     /* Полупрозрачный слой затемнения */
@@ -164,20 +213,20 @@
       text-align: center;
     }
 
-    /* --- СТИЛИ ТЕКСТА: ТЁМНЫЙ (для светлых, бежевых и крафтовых фонов) --- */
+    /* --- ТЁМНЫЙ ТЕКСТ (Светлые темы) --- */
     .main-title {
       font-size: 22px;
       font-weight: 800;
       letter-spacing: -0.5px;
       line-height: 1.15;
       text-transform: uppercase;
-      color: #111827; /* Насыщенный угольно-черный */
+      color: #111827;
     }
 
     .sub-text {
       font-size: 11.5px;
       font-weight: 700;
-      color: #374151; /* Контрастный серый, не блекнет */
+      color: #374151;
       margin-top: 6px;
       line-height: 1.35;
     }
@@ -187,14 +236,14 @@
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.8px;
-      color: #0369a1; /* Насыщенный синий */
+      color: #0369a1;
       margin-bottom: 6px;
     }
 
     .footer-text {
       font-size: 9px;
       font-weight: 800;
-      color: #4b5563; /* Четкий подвал */
+      color: #4b5563;
       letter-spacing: 1px;
       text-transform: uppercase;
       width: 100%;
@@ -203,7 +252,7 @@
       margin-top: 4px;
     }
 
-    /* --- СТИЛИ ТЕКСТА: СВЕТЛЫЙ (для тёмных графитовых и сланцевых фонов) --- */
+    /* --- СВЕТЛЫЙ ТЕКСТ (Тёмные темы) --- */
     .text-light .main-title {
       color: #ffffff !important;
       text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
@@ -227,10 +276,10 @@
       letter-spacing: 4px;
       line-height: 1;
       margin-bottom: 8px;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+      text-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
 
-    /* Подложка QR-кода: белая со скруглёнными углами для 100% считывания */
+    /* Подложка QR-кода */
     .qr-wrapper {
       display: flex;
       justify-content: center;
@@ -262,7 +311,7 @@
       border-radius: 6px;
       font-size: 10px;
       font-weight: 700;
-      background: rgba(255, 255, 255, 0.94);
+      background: rgba(255, 255, 255, 0.95);
       border: 1px solid rgba(0, 0, 0, 0.08);
       color: #0f172a;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -308,7 +357,17 @@
 
   <!-- Панель управления -->
   <div class="controls-panel no-print">
-    <label>Загрузить сгенерированный фон</label>
+    <label>Готовый стиль фона</label>
+    <select id="presetSelect" onchange="applyPreset(this.value)">
+      <option value="preset-white" selected>Чистый минимализм (Белый)</option>
+      <option value="preset-kraft">Тёплый крафт (Пекарня / Кофейня)</option>
+      <option value="preset-slate">Тёмный сланец / Графит (Рестораны / Барбершопы)</option>
+      <option value="preset-beauty">Пудровый мрамор (Салоны красоты / Спа)</option>
+      <option value="preset-auto">Тёмный карбон (Автосервисы / Детейлинг)</option>
+      <option value="preset-med">Свежий ментол (Клиники / Аптеки / Стоматология)</option>
+    </select>
+
+    <label>Или загрузить свой фон</label>
     <input type="file" id="bgInput" accept="image/*" onchange="handleBgUpload(event)">
 
     <label>Затемнение фона (<span id="dimVal">0%</span>)</label>
@@ -318,15 +377,15 @@
 
     <label>Цвет надписей</label>
     <select id="textColorSelect" onchange="changeTextColor(this.value)">
-      <option value="dark" selected>Тёмный текст (для крафта, бежевого и белого)</option>
-      <option value="light">Светлый текст (для тёмного сланца и камня)</option>
+      <option value="dark" selected>Тёмный текст (для светлых фонов)</option>
+      <option value="light">Светлый текст (для тёмных фонов)</option>
     </select>
 
     <label>Номер стойки (ID)</label>
     <input type="text" id="inId" value="001" oninput="updateCard()">
 
     <div class="btn-row">
-      <button type="button" class="btn-action btn-reset" onclick="resetBg()">Сбросить фон</button>
+      <button type="button" class="btn-action btn-reset" onclick="resetBg()">Сбросить к белому</button>
     </div>
 
     <button class="btn-print" onclick="window.print()">Распечатать макет</button>
@@ -334,7 +393,7 @@
 
   <!-- Печатный бланк (10 × 15 см) -->
   <div class="cut-wrapper">
-    <div class="stand-card" id="card">
+    <div class="stand-card preset-white" id="card">
       <div class="bg-overlay" id="overlay"></div>
 
       <div class="card-content" id="cardContent">
@@ -379,13 +438,35 @@
   </div>
 
   <script>
+    const allPresets = ['preset-white', 'preset-kraft', 'preset-slate', 'preset-beauty', 'preset-auto', 'preset-med'];
+
+    function applyPreset(presetClass) {
+      const card = document.getElementById('card');
+      card.style.backgroundImage = 'none'; // сброс загруженного файла
+      document.getElementById('bgInput').value = '';
+
+      allPresets.forEach(cls => card.classList.remove(cls));
+      card.classList.add(presetClass);
+
+      // Автоматическое переключение контраста текста
+      if (presetClass === 'preset-slate' || presetClass === 'preset-auto') {
+        document.getElementById('textColorSelect').value = 'light';
+        changeTextColor('light');
+      } else {
+        document.getElementById('textColorSelect').value = 'dark';
+        changeTextColor('dark');
+      }
+    }
+
     function handleBgUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = function(evt) {
-        document.getElementById('card').style.backgroundImage = `url('${evt.target.result}')`;
+        const card = document.getElementById('card');
+        allPresets.forEach(cls => card.classList.remove(cls));
+        card.style.backgroundImage = `url('${evt.target.result}')`;
       };
       reader.readAsDataURL(file);
     }
@@ -405,12 +486,10 @@
     }
 
     function resetBg() {
-      document.getElementById('card').style.backgroundImage = 'none';
-      document.getElementById('bgInput').value = '';
+      document.getElementById('presetSelect').value = 'preset-white';
+      applyPreset('preset-white');
       document.getElementById('dimRange').value = 0;
       changeDim(0);
-      document.getElementById('textColorSelect').value = 'dark';
-      changeTextColor('dark');
     }
 
     function updateCard() {
@@ -431,7 +510,6 @@
       });
     }
 
-    // Инициализация при открытии страницы
     updateCard();
   </script>
 </body>
