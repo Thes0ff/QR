@@ -25,7 +25,7 @@
       color: #f8fafc;
     }
 
-    /* Панель настроек */
+    /* Панель управления перед печатью */
     .controls-panel {
       background: #161e2e;
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -95,6 +95,10 @@
       border: 1px solid rgba(244, 63, 94, 0.3);
     }
 
+    .btn-reset:hover {
+      background: rgba(244, 63, 94, 0.25);
+    }
+
     .btn-print {
       width: 100%;
       background: #38bdf8;
@@ -114,13 +118,14 @@
       transform: translateY(-1px);
     }
 
-    /* Рамка и макет */
+    /* Внешняя рамка с метками обрезки под лист А4 */
     .cut-wrapper {
       padding: 15px;
       background: transparent;
       position: relative;
     }
 
+    /* Физическая стойка 100 × 150 мм (стандарт 10x15 см под акрил) */
     .stand-card {
       width: 100mm;
       height: 150mm;
@@ -128,17 +133,16 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      color: #090d16;
       border-radius: 4px;
       position: relative;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-      outline: 1px dashed #cbd5e1;
+      outline: 1px dashed #94a3b8; /* Контур для вырезания ножницами */
       overflow: hidden;
       display: flex;
       flex-direction: column;
     }
 
-    /* Слой затемнения фона */
+    /* Полупрозрачный слой затемнения */
     .bg-overlay {
       position: absolute;
       inset: 0;
@@ -147,12 +151,12 @@
       transition: background 0.2s ease;
     }
 
-    /* Внутренний контент */
+    /* Контейнер элементов */
     .card-content {
       position: relative;
       z-index: 2;
       height: 100%;
-      padding: 12mm 10mm 8mm 10mm;
+      padding: 11mm 10mm 8mm 10mm;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -160,18 +164,61 @@
       text-align: center;
     }
 
-    /* Варианты цвета текста */
-    .text-light {
+    /* --- СТИЛИ ТЕКСТА: ТЁМНЫЙ (для светлых, бежевых и крафтовых фонов) --- */
+    .main-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+      text-transform: uppercase;
+      color: #111827; /* Насыщенный угольно-черный */
+    }
+
+    .sub-text {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #374151; /* Контрастный серый, не блекнет */
+      margin-top: 6px;
+      line-height: 1.35;
+    }
+
+    .hint-label {
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #0369a1; /* Насыщенный синий */
+      margin-bottom: 6px;
+    }
+
+    .footer-text {
+      font-size: 9px;
+      font-weight: 800;
+      color: #4b5563; /* Четкий подвал */
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+
+    /* --- СТИЛИ ТЕКСТА: СВЕТЛЫЙ (для тёмных графитовых и сланцевых фонов) --- */
+    .text-light .main-title {
       color: #ffffff !important;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
     }
     .text-light .sub-text {
-      color: rgba(255, 255, 255, 0.8) !important;
-    }
-    .text-light .footer-text {
-      color: rgba(255, 255, 255, 0.65) !important;
+      color: rgba(255, 255, 255, 0.95) !important;
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.6);
     }
     .text-light .hint-label {
-      color: #7dd3fc !important;
+      color: #38bdf8 !important;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+    }
+    .text-light .footer-text {
+      color: rgba(255, 255, 255, 0.8) !important;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
     }
 
     .stars-box {
@@ -180,32 +227,15 @@
       letter-spacing: 4px;
       line-height: 1;
       margin-bottom: 8px;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     }
 
-    .main-title {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      line-height: 1.15;
-      text-transform: uppercase;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.15);
-    }
-
-    .sub-text {
-      font-size: 11px;
-      font-weight: 600;
-      color: #64748b;
-      margin-top: 6px;
-      line-height: 1.35;
-    }
-
-    /* Подложка QR-кода: всегда белая для гарантированного сканирования */
+    /* Подложка QR-кода: белая со скруглёнными углами для 100% считывания */
     .qr-wrapper {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 3mm 0;
+      margin: 2mm 0;
       background: #ffffff;
       padding: 10px;
       border-radius: 14px;
@@ -215,15 +245,6 @@
     .scan-hint-block {
       width: 100%;
       padding-top: 6px;
-    }
-
-    .hint-label {
-      font-size: 9px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: #0284c7;
-      margin-bottom: 6px;
     }
 
     .logos-container {
@@ -241,25 +262,13 @@
       border-radius: 6px;
       font-size: 10px;
       font-weight: 700;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.94);
       border: 1px solid rgba(0, 0, 0, 0.08);
       color: #0f172a;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
-    .footer-text {
-      font-size: 8.5px;
-      font-weight: 700;
-      color: #94a3b8;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      margin-top: 4px;
-    }
-
-    /* Стили для печати */
+    /* Настройки прямой печати */
     @media print {
       @page {
         margin: 0;
@@ -299,7 +308,7 @@
 
   <!-- Панель управления -->
   <div class="controls-panel no-print">
-    <label>Загрузить изображение фона</label>
+    <label>Загрузить сгенерированный фон</label>
     <input type="file" id="bgInput" accept="image/*" onchange="handleBgUpload(event)">
 
     <label>Затемнение фона (<span id="dimVal">0%</span>)</label>
@@ -309,8 +318,8 @@
 
     <label>Цвет надписей</label>
     <select id="textColorSelect" onchange="changeTextColor(this.value)">
-      <option value="dark">Тёмный текст (для светлых фонов)</option>
-      <option value="light">Светлый текст (для тёмных и ярких артов)</option>
+      <option value="dark" selected>Тёмный текст (для крафта, бежевого и белого)</option>
+      <option value="light">Светлый текст (для тёмного сланца и камня)</option>
     </select>
 
     <label>Номер стойки (ID)</label>
@@ -323,7 +332,7 @@
     <button class="btn-print" onclick="window.print()">Распечатать макет</button>
   </div>
 
-  <!-- Макет для печати (10 × 15 см) -->
+  <!-- Печатный бланк (10 × 15 см) -->
   <div class="cut-wrapper">
     <div class="stand-card" id="card">
       <div class="bg-overlay" id="overlay"></div>
@@ -422,6 +431,7 @@
       });
     }
 
+    // Инициализация при открытии страницы
     updateCard();
   </script>
 </body>
