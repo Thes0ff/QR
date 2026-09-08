@@ -45,6 +45,11 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    @keyframes modalSlideUp {
+      from { opacity: 0; transform: translateY(20px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.4; transform: scale(0.8); }
@@ -150,7 +155,8 @@
       border-radius: 16px;
       font-size: 16px;
       font-weight: 700;
-      text-decoration: none;
+      border: none;
+      cursor: pointer;
       box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.4);
       transition: all 0.2s ease;
       display: inline-flex;
@@ -259,6 +265,131 @@
       font-weight: 700;
       color: var(--accent);
       letter-spacing: 1px;
+    }
+
+    /* ==========================================================
+       СТИЛИ МОДАЛЬНОГО ОКНА ВЫБОРА СВЯЗИ
+       ========================================================== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 14, 0.78);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .contact-modal {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 34px 26px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+      position: relative;
+      text-align: center;
+      animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 34px;
+      height: 34px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.2s;
+    }
+    .modal-close-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .contact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .contact-btn {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 14px;
+      padding: 15px 18px;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(15, 23, 42, 0.6);
+      transition: all 0.2s ease;
+    }
+
+    .contact-btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(30, 41, 59, 0.8);
+      box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    .contact-icon-wrapper {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .icon-tg {
+      background: rgba(34, 158, 217, 0.15);
+      color: #229ed9;
+    }
+    .icon-vk {
+      background: rgba(0, 119, 255, 0.15);
+      color: #0077ff;
+    }
+    .icon-mail {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+    }
+
+    .contact-info {
+      text-align: left;
+    }
+    .contact-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .contact-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
     }
 
     @media (max-width: 768px) {
@@ -575,10 +706,14 @@
   <section class="hero">
     <h1>Честные отзывы<br>для <span>Вашего бизнеса</span></h1>
     <p>NFC-стойки и QR-коды, которые фильтруют негатив. Получайте 5 звёзд на карты, а жалобы — напрямую в Telegram, VK или на почту директора.</p>
-    <a href="https://t.me/your_manager" class="btn-main">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    
+    <!-- Кнопка вызова модального окна -->
+    <button class="btn-main" onclick="openContactModal()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
       Подключить систему
-    </a>
+    </button>
   </section>
 
   <section class="features">
@@ -612,7 +747,67 @@
 </div>
 
 <!-- ==========================================================
-     БЛОК 2: ВИДЖЕТ ОТЗЫВОВ (servis-kontrol.ru?id=...)
+     МОДАЛЬНОЕ ОКНО: ВЫБОР СВЯЗИ (TG / VK / ПОЧТА)
+     ========================================================== -->
+<div class="modal-overlay" id="contactModal" onclick="closeContactModal(event)">
+  <div class="contact-modal" onclick="event.stopPropagation()">
+    <button class="modal-close-btn" onclick="closeContactModal()">&times;</button>
+    
+    <div class="top-badge">
+      <span class="badge-glow"></span>
+      Связь с нами
+    </div>
+    <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 8px;">Подключение сервиса</h2>
+    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.4;">
+      Выберите удобный способ — ответим на вопросы и настроим стойки для ваших точек:
+    </p>
+
+    <div class="contact-list">
+      <!-- 1. Telegram -->
+      <a href="#" id="linkTg" target="_blank" class="contact-btn">
+        <div class="contact-icon-wrapper icon-tg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+          </svg>
+        </div>
+        <div class="contact-info">
+          <div class="contact-title">Telegram</div>
+          <div class="contact-sub">Быстрый ответ в мессенджере</div>
+        </div>
+      </a>
+
+      <!-- 2. ВКонтакте -->
+      <a href="#" id="linkVk" target="_blank" class="contact-btn">
+        <div class="contact-icon-wrapper icon-vk">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15.684 0H8.316C2.992 0 0 2.992 0 8.316v7.368C0 21.008 2.992 24 8.316 24h7.368C21.008 24 24 21.008 24 15.684V8.316C24 2.992 21.008 0 15.684 0zm3.602 17.154h-1.898c-.718 0-.938-.57-2.226-1.862-1.12-1.092-1.616-1.232-1.898-1.232-.394 0-.508.114-.508.66v1.732c0 .466-.148.746-1.37.746-2.02 0-4.26-1.228-5.844-3.51-2.38-3.376-3.036-5.918-3.036-6.438 0-.284.114-.548.66-.548h1.898c.494 0 .68.228.87.746 1.002 2.72 2.68 5.108 3.376 5.108.26 0 .376-.114.376-.746V10.22c-.08-1.332-.776-1.444-.776-1.916 0-.226.19-.452.496-.452h3.116c.418 0 .57.226.57.722v3.896c0 .418.188.57.308.57.26 0 .474-.15.952-.63 1.464-1.636 2.508-4.148 2.508-4.148.136-.284.38-.452.87-.452h1.898c.57 0 .694.284.57.722-.246 1.092-2.528 4.318-2.64 4.544-.24.376-.33.548 0 1.01.24.338 1.042 1.022 1.576 1.638.99 1.144 1.758 2.102 1.964 2.764.208.64-.108.972-.592.972z"/>
+          </svg>
+        </div>
+        <div class="contact-info">
+          <div class="contact-title">ВКонтакте</div>
+          <div class="contact-sub">Личные сообщения сообщества</div>
+        </div>
+      </a>
+
+      <!-- 3. Почта -->
+      <a href="#" id="linkMail" class="contact-btn">
+        <div class="contact-icon-wrapper icon-mail">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+        <div class="contact-info">
+          <div class="contact-title">Электронная почта</div>
+          <div class="contact-sub">Для официальных запросов и счетов</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================
+     БЛОК 3: ВИДЖЕТ ОТЗЫВОВ (servis-kontrol.ru?id=...)
      ========================================================== -->
 <div id="widget-page">
   <div class="widget-card" id="widgetCard">
@@ -691,6 +886,15 @@
 </div>
 
 <script>
+  // ==========================================================
+  // ВАШИ КОНТАКТЫ ДЛЯ КЛИЕНТОВ (настройте под себя):
+  // ==========================================================
+  const CONTACT_LINKS = {
+    tg: "https://t.me/your_manager",               // Ваша ссылка на Telegram
+    vk: "https://vk.me/your_public",               // Ваша ссылка на диалог VK
+    email: "info@servis-kontrol.ru"                // Ваша почта
+  };
+
   const GIST_ID = "052f7c277f6e1fc78a305e81e2135f65";
   const urlParams = new URLSearchParams(window.location.search);
   const shopId = urlParams.get('id');
@@ -699,6 +903,27 @@
   const widgetPage = document.getElementById('widget-page');
   const demoContainer = document.querySelector('.demo-container');
   const widgetCardMaster = document.getElementById('widgetCard');
+  const contactModal = document.getElementById('contactModal');
+
+  // Привязываем ссылки модалки
+  document.getElementById('linkTg').href = CONTACT_LINKS.tg;
+  document.getElementById('linkVk').href = CONTACT_LINKS.vk;
+  document.getElementById('linkMail').href = `mailto:${CONTACT_LINKS.email}?subject=${encodeURIComponent("Подключение системы Сервис Контроль")}`;
+
+  function openContactModal() {
+    contactModal.classList.add('active');
+  }
+
+  function closeContactModal(e) {
+    if (!e || e.target === contactModal) {
+      contactModal.classList.remove('active');
+    }
+  }
+
+  // Закрытие по клавише Esc
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') contactModal.classList.remove('active');
+  });
 
   const ratingLabels = {
     1: "😡 Ужасный сервис",
