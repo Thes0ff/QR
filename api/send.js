@@ -70,7 +70,7 @@ module.exports = async function handler(req, res) {
             'Authorization': `Bearer ${RESEND_API_KEY.trim()}`
           },
           body: JSON.stringify({
-            from: 'Контроль Сервиса <onboarding@resend.dev>',
+            from: 'Контроль Сервиса <noreply@servis-kontrol.ru>',
             to: shop.targets.email,
             subject: `🚨 Жалоба: ${shopName}`,
             text: text
