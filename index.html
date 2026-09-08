@@ -1,264 +1,7 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Контроль качества</title>
-  <style>
-    :root {
-      --bg: #090d16;
-      --card-bg: rgba(17, 24, 39, 0.75);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-focus: #38bdf8;
-      --accent: #38bdf8;
-      --accent-grad: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --star-glow: rgba(251, 191, 36, 0.45);
-      --danger-bg: rgba(244, 63, 94, 0.12);
-      --danger-border: rgba(244, 63, 94, 0.4);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body {
-      background-color: var(--bg);
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-        radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.8) 0px, transparent 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px 16px;
-      color: var(--text);
-    }
-    .widget-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      width: 100%;
-      max-width: 420px;
-      border-radius: 28px;
-      padding: 34px 26px;
-      border: 1px solid var(--border);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .widget-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 15%;
-      right: 15%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), transparent);
-    }
-    .top-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(56, 189, 248, 0.08);
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      color: var(--accent);
-      padding: 6px 14px;
-      border-radius: 99px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-    .badge-glow {
-      width: 6px;
-      height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--accent);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.8); }
-    }
-    h1 {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.4px;
-      line-height: 1.25;
-      margin-bottom: 8px;
-      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    p.subtitle {
-      font-size: 14px;
-      color: var(--text-muted);
-      line-height: 1.5;
-      margin-bottom: 30px;
-    }
-    .rating-container { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 10px; }
-    .stars-box { display: flex; gap: 12px; justify-content: center; }
-    .star-btn { background: none; border: none; cursor: pointer; padding: 4px; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .star-icon { width: 44px; height: 44px; fill: #1e293b; stroke: #334155; stroke-width: 1.5; transition: all 0.25s ease; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
-    .star-btn.active .star-icon { fill: #fbbf24; stroke: #f59e0b; filter: drop-shadow(0 0 14px var(--star-glow)); }
-    .star-btn:hover { transform: scale(1.15); }
-    .rating-pill {
-      min-height: 32px;
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 16px;
-      border-radius: 99px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-muted);
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      transition: all 0.3s ease;
-    }
-    .complaint-section { display: none; margin-top: 24px; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    .tag-title { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-    .tags-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
-    .tag-item {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border);
-      color: #cbd5e1;
-      padding: 8px 14px;
-      border-radius: 12px;
-      font-size: 13px;
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.2s ease;
-    }
-    .tag-item.selected { background: var(--danger-bg); border-color: var(--danger-border); color: #fda4af; font-weight: 600; }
-    textarea, input {
-      width: 100%;
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 16px;
-      font-size: 14px;
-      color: #fff;
-      outline: none;
-      margin-bottom: 12px;
-      transition: all 0.2s ease;
-    }
-    textarea:focus, input:focus { border-color: var(--border-focus); background: rgba(15, 23, 42, 0.9); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); }
-    .btn-submit {
-      width: 100%;
-      background: var(--accent-grad);
-      color: #0f172a;
-      border: none;
-      padding: 16px;
-      border-radius: 14px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.4);
-      transition: all 0.2s ease;
-    }
-    .btn-submit:hover { opacity: 0.95; transform: translateY(-1px); }
-    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .status-screen { display: none; text-align: center; padding: 24px 8px; animation: fadeIn 0.4s ease; }
-    .spinner {
-      width: 54px;
-      height: 54px;
-      border: 3px solid rgba(56, 189, 248, 0.15);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      margin: 0 auto 20px;
-      animation: spin 1s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite;
-    }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    .check-icon {
-      width: 58px;
-      height: 58px;
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: #34d399;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      margin: 0 auto 20px;
-      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
-    }
-  </style>
-</head>
-<body>
-
-<div class="widget-card">
-  <div id="headerBox">
-    <div class="top-badge">
-      <span class="badge-glow"></span>
-      Служба сервиса
-    </div>
-    <h1 id="shopName">Оцените обслуживание</h1>
-    <p class="subtitle">Ваш отзыв направляется напрямую руководству заведения</p>
-  </div>
-
-  <div class="rating-container" id="ratingBox">
-    <div class="stars-box">
-      <button class="star-btn" data-val="1">
-        <svg class="star-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      </button>
-      <button class="star-btn" data-val="2">
-        <svg class="star-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      </button>
-      <button class="star-btn" data-val="3">
-        <svg class="star-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      </button>
-      <button class="star-btn" data-val="4">
-        <svg class="star-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      </button>
-      <button class="star-btn" data-val="5">
-        <svg class="star-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      </button>
-    </div>
-    <div class="rating-pill" id="ratingText">Поставьте оценку</div>
-  </div>
-
-  <div class="status-screen" id="redirectBlock">
-    <div class="spinner"></div>
-    <h2 style="font-size: 19px; margin-bottom: 6px;">Спасибо за высокую оценку!</h2>
-    <p style="color: var(--text-muted); font-size: 14px;">Перенаправляем в Яндекс.Карты...</p>
-  </div>
-
-  <div class="complaint-section" id="negativeForm">
-    <div class="tag-title">Что вызвало неудобство?</div>
-    <div class="tags-grid">
-      <div class="tag-item" onclick="toggleTag(this)">Долгое ожидание</div>
-      <div class="tag-item" onclick="toggleTag(this)">Грубый персонал</div>
-      <div class="tag-item" onclick="toggleTag(this)">Качество товара</div>
-      <div class="tag-item" onclick="toggleTag(this)">Завышенная цена</div>
-      <div class="tag-item" onclick="toggleTag(this)">Чистота зала</div>
-    </div>
-
-    <textarea id="comment" rows="3" placeholder="Расскажите подробнее, что нужно исправить..."></textarea>
-    <input type="tel" id="phone" placeholder="Ваш телефон для ответа дирекции (по желанию)">
-
-    <button class="btn-submit" id="btnSend" onclick="submitComplaint()">
-      Отправить директору
-    </button>
-  </div>
-
-  <div class="status-screen" id="successBlock">
-    <div class="check-icon">✓</div>
-    <h2 style="font-size: 20px; margin-bottom: 6px;">Сообщение передано</h2>
-    <p style="color: var(--text-muted); font-size: 14px; line-height: 1.5;">Спасибо! Руководство точки уже уведомлено и примет меры.</p>
-  </div>
-</div>
-
 <script>
-  // ================= ВСТАВЬТЕ ВАШИ КЛЮЧИ ЗДЕСЬ =================
-  const GIST_ID = "052f7c277f6e1fc78a305e81e2135f65";                    // Скопированный хеш Gist
-  const TG_BOT_TOKEN = "8817983944:AAGKicw_DtTJAfj-CkneaDVC3tkRjctUkEI";        // Из @BotFather
-  const VK_GROUP_TOKEN = "vk1.a.C40C62dAeHCtf2R0i9n3vtJEt0nRsl7QmQ1hTSUFi7XKRUxMnfBOKXUG9ETOeY94Z2ajIK0ylKwaiO6LI8IH7ztl9c-aANbu9wRGYwtEr-WbO6WhzA3e0tHewrysTklLdQFYBrx2Dal_5o0Zq0Dq-QK_VEejGwB7UnrrsBNcpcpQA1or-sXgCmF2YNqNW9gjuNbVEReBCzyyfR_nvjfeug"; // Из «Работа с API» в VK
-  const WEB3FORMS_KEY = "ad3600c7-082b-4a02-901e-677cbb490b3b";        // С сайта web3forms.com
-  // ============================================================
+  // Публичный ID для чтения имени магазина и ссылки на карты
+  // (секретные токены ботов сюда НЕ попадают)
+  const GIST_ID = "ВАШ_GIST_ID"; 
 
   const labels = {
     1: "😡 Ужасный сервис",
@@ -274,9 +17,7 @@
   let selectedRating = 0;
   let selectedTags = [];
 
-  window.vkCallback = function(r) { console.log("VK status:", r); };
-
-  // Загрузка через Gist API без задержек и кэша
+  // Загружаем конфиг для редиректа на карты
   fetch(`https://api.github.com/gists/${GIST_ID}`)
     .then(r => r.json())
     .then(data => {
@@ -286,7 +27,7 @@
         document.getElementById('shopName').innerText = shopConfig.name;
       }
     })
-    .catch(err => console.error("Ошибка загрузки точки:", err));
+    .catch(err => console.error("Ошибка загрузки:", err));
 
   const buttons = document.querySelectorAll('.star-btn');
   buttons.forEach((btn, idx) => {
@@ -305,7 +46,7 @@
         document.getElementById('redirectBlock').style.display = 'block';
         setTimeout(() => {
           window.location.href = (shopConfig && shopConfig.maps_url) ? shopConfig.maps_url : 'https://yandex.ru/maps';
-        }, 900);
+        }, 850);
       } else {
         document.getElementById('negativeForm').style.display = 'block';
       }
@@ -330,39 +71,21 @@
     btn.disabled = true;
     btn.innerText = "Отправка...";
 
-    const reasons = selectedTags.length > 0 ? `\n📌 Проблемы: ${selectedTags.join(', ')}` : '';
-    const text = `🚨 ЖАЛОБА С КАССЫ: ${shopConfig ? shopConfig.name : shopId}\n` +
-                 `⭐ Оценка: ${selectedRating} из 5` +
-                 reasons +
-                 `\n💬 Текст: ${comment || 'Не указан'}\n` +
-                 `📞 Телефон гостя: ${phone || 'Не указан'}`;
-
     try {
-      if (shopConfig && shopConfig.channel === 'telegram') {
-        await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: shopConfig.target, text: text })
-        });
-      } else if (shopConfig && shopConfig.channel === 'vk') {
-        const rnd = Math.floor(Math.random() * 1000000);
-        const scr = document.createElement('script');
-        scr.src = `https://api.vk.com/method/messages.send?user_id=${shopConfig.target}&message=${encodeURIComponent(text)}&random_id=${rnd}&access_token=${VK_GROUP_TOKEN}&v=5.199&callback=vkCallback`;
-        document.body.appendChild(scr);
-      } else if (shopConfig && shopConfig.channel === 'email') {
-        await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            access_key: WEB3FORMS_KEY,
-            to: shopConfig.target,
-            subject: `Жалоба: ${shopConfig.name}`,
-            message: text
-          })
-        });
-      }
+      // Отправляем данные на наш защищенный бессерверный бэкенд
+      await fetch('/api/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shopId: shopId,
+          rating: selectedRating,
+          tags: selectedTags,
+          comment: comment,
+          phone: phone
+        })
+      });
     } catch (e) {
-      console.error("Ошибка отправки:", e);
+      console.error("Ошибка сети:", e);
     }
 
     document.getElementById('headerBox').style.display = 'none';
@@ -371,6 +94,3 @@
     document.getElementById('successBlock').style.display = 'block';
   }
 </script>
-
-</body>
-</html>
