@@ -41,7 +41,6 @@
       color: var(--text);
     }
 
-    /* Матовая стеклянная карточка */
     .widget-card {
       background: var(--card-bg);
       backdrop-filter: blur(24px);
@@ -59,7 +58,6 @@
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* Верхняя светящаяся линия */
     .widget-card::before {
       content: '';
       position: absolute;
@@ -118,7 +116,6 @@
       margin-bottom: 30px;
     }
 
-    /* Звёзды рейтинга */
     .rating-container {
       display: flex;
       flex-direction: column;
@@ -175,7 +172,6 @@
       transition: all 0.3s ease;
     }
 
-    /* Секция жалобы */
     .complaint-section {
       display: none;
       margin-top: 24px;
@@ -260,13 +256,6 @@
       transform: translateY(-1px);
     }
 
-    .btn-submit:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* Экраны статуса */
     .status-screen {
       display: none;
       text-align: center;
@@ -275,8 +264,8 @@
     }
 
     .spinner {
-      width: 54px;
-      height: 54px;
+      width: 50px;
+      height: 50px;
       border: 3px solid rgba(56, 189, 248, 0.15);
       border-top-color: var(--accent);
       border-radius: 50%;
@@ -300,22 +289,59 @@
       margin: 0 auto 20px;
       box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
     }
+
+    /* Кнопки выбора карт для 4-5 звезд */
+    .maps-choice-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn-map {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-yandex {
+      background: #fc3f1d;
+      color: #ffffff;
+      box-shadow: 0 8px 18px -4px rgba(252, 63, 29, 0.4);
+    }
+
+    .btn-2gis {
+      background: #00a651;
+      color: #ffffff;
+      box-shadow: 0 8px 18px -4px rgba(0, 166, 81, 0.4);
+    }
+
+    .btn-map:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
   </style>
 </head>
 <body>
 
 <div class="widget-card">
-  <!-- Шапка -->
   <div id="headerBox">
     <div class="top-badge">
       <span class="badge-glow"></span>
       Служба сервиса
     </div>
     <h1 id="shopName">Оцените обслуживание</h1>
-    <p class="subtitle">Ваш отзыв направляется напрямую руководству заведения</p>
+    <p class="subtitle" id="subTitle">Ваш отзыв направляется напрямую руководству заведения</p>
   </div>
 
-  <!-- Оценка звёздами -->
   <div class="rating-container" id="ratingBox">
     <div class="stars-box">
       <button class="star-btn" data-val="1">
@@ -337,14 +363,25 @@
     <div class="rating-pill" id="ratingText">Поставьте оценку</div>
   </div>
 
-  <!-- Экран перехода на карты (4-5 звезд) -->
+  <!-- Экран автоперехода (если карта всего одна) -->
   <div class="status-screen" id="redirectBlock">
     <div class="spinner"></div>
-    <h2 style="font-size: 19px; margin-bottom: 6px;">Спасибо за высокую оценку!</h2>
-    <p style="color: var(--text-muted); font-size: 14px;">Перенаправляем в Яндекс.Карты...</p>
+    <h2 style="font-size: 19px; margin-bottom: 6px;">Спасибо за оценку!</h2>
+    <p style="color: var(--text-muted); font-size: 14px;">Перенаправляем на карту...</p>
   </div>
 
-  <!-- Форма для 1-3 звёзд -->
+  <!-- Экран выбора карт (если добавлены и Яндекс, и 2ГИС) -->
+  <div class="status-screen" id="chooseMapBlock">
+    <div class="check-icon">⭐</div>
+    <h2 style="font-size: 20px; margin-bottom: 6px;">Спасибо за визит!</h2>
+    <p style="color: var(--text-muted); font-size: 14px;">Где вам удобнее оставить отзыв?</p>
+    <div class="maps-choice-grid">
+      <a id="btnYandex" href="#" class="btn-map btn-yandex" target="_blank">Яндекс.Карты</a>
+      <a id="btn2Gis" href="#" class="btn-map btn-2gis" target="_blank">2ГИС</a>
+    </div>
+  </div>
+
+  <!-- Форма негатива (1-3 звезды) -->
   <div class="complaint-section" id="negativeForm">
     <div class="tag-title">Что вызвало неудобство?</div>
     <div class="tags-grid">
@@ -363,7 +400,6 @@
     </button>
   </div>
 
-  <!-- Экран благодарности за замечание -->
   <div class="status-screen" id="successBlock">
     <div class="check-icon">✓</div>
     <h2 style="font-size: 20px; margin-bottom: 6px;">Сообщение передано</h2>
@@ -372,10 +408,7 @@
 </div>
 
 <script>
-  // ================= НАСТРОЙКА =================
-  // Вставьте сюда ID вашего Gist (только публичный хеш из адреса Gist)
   const GIST_ID = "052f7c277f6e1fc78a305e81e2135f65";
-  // ============================================
 
   const labels = {
     1: "😡 Ужасный сервис",
@@ -391,7 +424,6 @@
   let selectedRating = 0;
   let selectedTags = [];
 
-  // Загружаем имя точки и ссылку на карты для быстрого перехода
   fetch(`https://api.github.com/gists/${GIST_ID}`)
     .then(r => r.json())
     .then(data => {
@@ -401,7 +433,7 @@
         document.getElementById('shopName').innerText = shopConfig.name;
       }
     })
-    .catch(err => console.error("Ошибка загрузки данных точки:", err));
+    .catch(err => console.error("Ошибка загрузки точки:", err));
 
   const buttons = document.querySelectorAll('.star-btn');
   buttons.forEach((btn, idx) => {
@@ -417,10 +449,24 @@
 
       if (selectedRating >= 4) {
         document.getElementById('ratingBox').style.display = 'none';
-        document.getElementById('redirectBlock').style.display = 'block';
-        setTimeout(() => {
-          window.location.href = (shopConfig && shopConfig.maps_url) ? shopConfig.maps_url : 'https://yandex.ru/maps';
-        }, 850);
+        document.getElementById('headerBox').style.display = 'none';
+
+        const yaUrl = shopConfig?.yandex_url || shopConfig?.maps_url;
+        const gisUrl = shopConfig?.gis_url;
+
+        // Если указаны оба сервиса — даём посетителю выбор
+        if (yaUrl && gisUrl) {
+          document.getElementById('btnYandex').href = yaUrl;
+          document.getElementById('btn2Gis').href = gisUrl;
+          document.getElementById('chooseMapBlock').style.display = 'block';
+        } else {
+          // Если только один — авторедирект
+          const targetUrl = yaUrl || gisUrl || 'https://yandex.ru/maps';
+          document.getElementById('redirectBlock').style.display = 'block';
+          setTimeout(() => {
+            window.location.href = targetUrl;
+          }, 850);
+        }
       } else {
         document.getElementById('negativeForm').style.display = 'block';
       }
@@ -446,7 +492,6 @@
     btn.innerText = "Отправка...";
 
     try {
-      // Отправляем запрос на наш защищенный бессерверный API в Vercel
       await fetch('/api/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -459,7 +504,7 @@
         })
       });
     } catch (e) {
-      console.error("Сетевая ошибка при отправке:", e);
+      console.error("Сетевая ошибка:", e);
     }
 
     document.getElementById('headerBox').style.display = 'none';
