@@ -2,24 +2,186 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Активация стойки</title>
   <style>
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #0f172a; color: #f8fafc; display: flex; justify-content: center; padding: 16px; margin: 0; }
-    .card { background: #1e293b; width: 100%; max-width: 440px; padding: 24px; border-radius: 16px; border: 1px solid #334155; }
-    h2 { margin: 0 0 16px 0; font-size: 20px; }
-    label { display: block; font-size: 12px; text-transform: uppercase; color: #94a3b8; margin-bottom: 5px; font-weight: 600; }
-    input { width: 100%; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 12px; border-radius: 10px; font-size: 14px; margin-bottom: 14px; outline: none; }
-    input:focus { border-color: #38bdf8; }
-    .channel-box { background: rgba(15, 23, 42, 0.6); padding: 14px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 16px; }
-    .channel-title { font-size: 13px; font-weight: 700; color: #38bdf8; margin-bottom: 10px; text-transform: uppercase; }
-    button { width: 100%; background: #38bdf8; color: #0f172a; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; }
-    .status { margin-top: 12px; padding: 10px; border-radius: 8px; font-size: 13px; text-align: center; display: none; }
-    .success { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
-    .error { background: rgba(239, 68, 68, 0.15); color: #f87171; }
-    details { margin-bottom: 18px; border-bottom: 1px solid #334155; padding-bottom: 12px; }
-    summary { font-size: 13px; color: #38bdf8; cursor: pointer; }
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(17, 24, 39, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: #38bdf8;
+      --accent: #38bdf8;
+      --accent-grad: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --input-bg: rgba(15, 23, 42, 0.6);
+      --channel-bg: rgba(15, 23, 42, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.85) 0px, transparent 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 16px;
+      color: var(--text);
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      width: 100%;
+      max-width: 440px;
+      border-radius: 24px;
+      padding: 30px 24px;
+      border: 1px solid var(--border);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 18px;
+    }
+
+    details {
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 14px;
+    }
+
+    summary {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+    }
+
+    .keys-box {
+      margin-top: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: #fff;
+      outline: none;
+      margin-bottom: 14px;
+      transition: all 0.2s ease;
+    }
+
+    input:focus {
+      border-color: var(--border-focus);
+      background: rgba(15, 23, 42, 0.9);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+
+    /* Блок мульти-каналов */
+    .channels-card {
+      background: var(--channel-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .channels-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .channels-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--accent);
+    }
+
+    .channels-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--accent-grad);
+      color: #0f172a;
+      border: none;
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-submit:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status-box {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      text-align: center;
+      display: none;
+      font-weight: 500;
+    }
+
+    .status-ok {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+
+    .status-err {
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      color: #fda4af;
+    }
   </style>
 </head>
 <body>
@@ -28,10 +190,11 @@
   <h2>Активация стойки</h2>
 
   <details>
-    <summary>Ключи доступа (Gist + Token)</summary>
-    <div style="margin-top: 10px;">
+    <summary>▼ Ключи доступа (ввести один раз)</summary>
+    <div class="keys-box">
       <label>GitHub Gist ID</label>
-      <input type="text" id="gistId" placeholder="Хеш из адреса Gist">
+      <input type="text" id="gistId" placeholder="Хеш из адресной строки Gist">
+
       <label>GitHub Personal Token</label>
       <input type="password" id="ghToken" placeholder="ghp_...">
     </div>
@@ -44,32 +207,35 @@
   <input type="text" id="shopName" placeholder="Кофейня «Утро»">
 
   <label>Ссылка на Яндекс.Карты / 2ГИС</label>
-  <input type="url" id="mapsUrl" placeholder="https://yandex.ru/maps/org/...">
+  <input type="url" id="mapsUrl" placeholder="https://yandex.ru/maps/-/... ">
 
-  <!-- Блок выбора каналов уведомлений -->
-  <div class="channel-box">
-    <div class="channel-title">Куда слать негатив (заполните нужные):</div>
+  <div class="channels-card">
+    <div class="channels-header">
+      <span class="channels-title">Куда слать негатив</span>
+      <span class="channels-hint">Заполните нужные</span>
+    </div>
 
     <label>Telegram (Chat ID)</label>
-    <input type="text" id="targetTg" placeholder="Например: 123456789">
+    <input type="text" id="targetTg" placeholder="Например: 423133556">
 
     <label>ВКонтакте (VK User ID)</label>
     <input type="text" id="targetVk" placeholder="Например: 74829102">
 
     <label>Электронная почта (Email)</label>
-    <input type="email" id="targetEmail" placeholder="director@mail.ru">
+    <input type="email" id="targetEmail" placeholder="director@company.ru">
   </div>
 
-  <button onclick="saveShop()" id="btnSave">Привязать стойку</button>
-  <div id="status" class="status"></div>
+  <button class="btn-submit" id="btnSave" onclick="saveShop()">Привязать стойку</button>
+  <div id="statusBox" class="status-box"></div>
 </div>
 
 <script>
+  // Автоматически восстанавливаем ранее сохраненные ключи
   document.getElementById('gistId').value = localStorage.getItem('cfg_gist_id') || '';
   document.getElementById('ghToken').value = localStorage.getItem('cfg_gh_token') || '';
 
   async function saveShop() {
-    const status = document.getElementById('status');
+    const status = document.getElementById('statusBox');
     const btn = document.getElementById('btnSave');
     status.style.display = 'none';
 
@@ -84,29 +250,33 @@
     const targetEmail = document.getElementById('targetEmail').value.trim();
 
     if (!gistId || !token || !shopId || !name || !mapsUrl) {
-      showStatus('Заполните основные данные точки!', false);
+      showMessage('Заполните все основные поля стойки!', false);
       return;
     }
 
     if (!targetTg && !targetVk && !targetEmail) {
-      showStatus('Укажите хотя бы один контакт (Telegram, VK или Email)!', false);
+      showMessage('Укажите хотя бы один канал (Telegram, VK или Email)!', false);
       return;
     }
 
+    // Сохраняем сервисные ключи в памяти браузера
     localStorage.setItem('cfg_gist_id', gistId);
     localStorage.setItem('cfg_gh_token', token);
 
     btn.disabled = true;
-    btn.innerText = 'Сохранение...';
+    btn.innerText = 'Сохранение в Gist...';
 
     try {
-      const resGet = await fetch(`https://api.github.com/gists/${gistId}`, {
+      const getRes = await fetch(`https://api.github.com/gists/${gistId}`, {
         headers: { 'Authorization': `token ${token}` }
       });
-      const gistData = await resGet.json();
+      
+      if (!getRes.ok) throw new Error('Bad credentials');
+      
+      const gistData = await getRes.json();
       let shops = JSON.parse(gistData.files['shops.json'].content || '{}');
 
-      // Сохраняем объект с активными каналами
+      // Сохраняем стойку с поддержкой сразу нескольких каналов
       shops[shopId] = {
         name: name,
         maps_url: mapsUrl,
@@ -117,7 +287,7 @@
         }
       };
 
-      const resPatch = await fetch(`https://api.github.com/gists/${gistId}`, {
+      const patchRes = await fetch(`https://api.github.com/gists/${gistId}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `token ${token}`,
@@ -128,8 +298,8 @@
         })
       });
 
-      if (resPatch.ok) {
-        showStatus(`Стойка №${shopId} успешно настроена!`, true);
+      if (patchRes.ok) {
+        showMessage(`Стойка №${shopId} успешно обновлена!`, true);
         document.getElementById('shopId').value = '';
         document.getElementById('shopName').value = '';
         document.getElementById('mapsUrl').value = '';
@@ -137,22 +307,23 @@
         document.getElementById('targetVk').value = '';
         document.getElementById('targetEmail').value = '';
       } else {
-        showStatus('Ошибка GitHub API: проверьте токен', false);
+        showMessage('Ошибка сохранения: проверьте права токена GitHub', false);
       }
     } catch (e) {
-      showStatus('Ошибка соединения с GitHub', false);
+      showMessage('Ошибка доступа к Gist. Проверьте токен и Gist ID', false);
     } finally {
       btn.disabled = false;
       btn.innerText = 'Привязать стойку';
     }
   }
 
-  function showStatus(text, ok) {
-    const el = document.getElementById('status');
-    el.className = `status ${ok ? 'success' : 'error'}`;
+  function showMessage(text, isSuccess) {
+    const el = document.getElementById('statusBox');
+    el.className = `status-box ${isSuccess ? 'status-ok' : 'status-err'}`;
     el.innerText = text;
     el.style.display = 'block';
   }
 </script>
+
 </body>
 </html>
