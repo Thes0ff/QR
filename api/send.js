@@ -62,7 +62,7 @@ module.exports = async function handler(req, res) {
       );
     }
 
-// 4. Отправка на Email (Web3Forms)
+    // 4. Отправка на Email (Web3Forms со всеми обязательными полями)
     if (shop.targets?.email && WEB3FORMS_KEY) {
       requests.push(
         fetch('https://api.web3forms.com/submit', {
@@ -75,7 +75,7 @@ module.exports = async function handler(req, res) {
             access_key: WEB3FORMS_KEY.trim(),
             name: "Служба контроля качества",
             email: "report@servis-kontrol.ru",
-            subject: `🚨 Жалоба с кассы: ${shopName}`,
+            subject: `🚨 Жалоба: ${shopName}`,
             message: text
           })
         })
@@ -85,4 +85,17 @@ module.exports = async function handler(req, res) {
         })
         .catch((err) => console.error('=== WEB3FORMS ERROR ===:', err))
       );
+    } else {
+      console.log('Email не отправлен. Причина:', {
+        hasTargetEmail: Boolean(shop.targets?.email),
+        hasKey: Boolean(WEB3FORMS_KEY)
+      });
     }
+
+    await Promise.all(requests);
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('Ошибка бэкенда:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
