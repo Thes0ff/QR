@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Разрешаем только POST запросы
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     const VK_GROUP_TOKEN = process.env.VK_GROUP_TOKEN;
     const WEB3FORMS_KEY = process.env.WEB3FORMS_KEY;
 
-    // 1. Получаем данные точки из GitHub Gist
+    // 1. Читаем данные точки из GitHub Gist
     const gistRes = await fetch(`https://api.github.com/gists/${GIST_ID}`);
     const gistData = await gistRes.json();
     const shops = JSON.parse(gistData.files['shops.json'].content || '{}');
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
       );
     }
 
-// 4. Отправка на Email (Web3Forms)
+    // 4. Отправка на Email (Web3Forms)
     if (shop.targets?.email && WEB3FORMS_KEY) {
       requests.push(
         fetch('https://api.web3forms.com/submit', {
@@ -91,3 +91,11 @@ export default async function handler(req, res) {
         hasKey: Boolean(WEB3FORMS_KEY)
       });
     }
+
+    await Promise.all(requests);
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('Ошибка бэкенда:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
