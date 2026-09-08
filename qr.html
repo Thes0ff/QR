@@ -25,7 +25,6 @@
       color: #f8fafc;
     }
 
-    /* Панель настроек */
     .controls-panel {
       background: #161e2e;
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -118,16 +117,14 @@
       transform: translateY(-1px);
     }
 
-    /* Внешняя рамка */
     .cut-wrapper {
       padding: 15px;
       background: transparent;
       position: relative;
     }
 
-    /* Базовые стили карточки */
     .stand-card {
-      background-color: #ffffff;
+      background-color: #000000;
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -141,12 +138,8 @@
       transition: width 0.2s ease, height 0.2s ease;
     }
 
-    /* ================= РАЗМЕРЫ ФОРМАТОВ ================= */
-    /* 1. 10 x 15 см (А6) */
-    .format-10x15 {
-      width: 100mm;
-      height: 150mm;
-    }
+    /* ФОРМАТЫ */
+    .format-10x15 { width: 100mm; height: 150mm; }
     .format-10x15 .card-content { padding: 11mm 10mm 8mm 10mm; }
     .format-10x15 .main-title { font-size: 22px; }
     .format-10x15 .sub-text { font-size: 11.5px; }
@@ -157,11 +150,7 @@
     .format-10x15 .footer-text { font-size: 9px; }
     .format-10x15 .qr-wrapper { padding: 10px; border-radius: 14px; margin: 2mm 0; }
 
-    /* 2. А5 (148 x 210 мм) */
-    .format-a5 {
-      width: 148mm;
-      height: 210mm;
-    }
+    .format-a5 { width: 148mm; height: 210mm; }
     .format-a5 .card-content { padding: 15mm 13mm 11mm 13mm; }
     .format-a5 .main-title { font-size: 32px; }
     .format-a5 .sub-text { font-size: 16px; margin-top: 8px; }
@@ -172,11 +161,7 @@
     .format-a5 .footer-text { font-size: 12px; }
     .format-a5 .qr-wrapper { padding: 14px; border-radius: 18px; margin: 3mm 0; }
 
-    /* 3. А4 (210 x 297 мм) */
-    .format-a4 {
-      width: 210mm;
-      height: 297mm;
-    }
+    .format-a4 { width: 210mm; height: 297mm; }
     .format-a4 .card-content { padding: 22mm 18mm 16mm 18mm; }
     .format-a4 .main-title { font-size: 46px; }
     .format-a4 .sub-text { font-size: 22px; margin-top: 12px; }
@@ -187,11 +172,7 @@
     .format-a4 .footer-text { font-size: 16px; }
     .format-a4 .qr-wrapper { padding: 18px; border-radius: 24px; margin: 5mm 0; }
 
-    /* 4. А3 (297 x 420 мм) */
-    .format-a3 {
-      width: 297mm;
-      height: 420mm;
-    }
+    .format-a3 { width: 297mm; height: 420mm; }
     .format-a3 .card-content { padding: 30mm 25mm 22mm 25mm; }
     .format-a3 .main-title { font-size: 64px; }
     .format-a3 .sub-text { font-size: 30px; margin-top: 16px; }
@@ -202,7 +183,8 @@
     .format-a3 .footer-text { font-size: 22px; }
     .format-a3 .qr-wrapper { padding: 24px; border-radius: 32px; margin: 8mm 0; }
 
-    /* ================= ВСТРОЕННЫЕ ПРЕСЕТЫ ================= */
+    /* ПРЕСЕТЫ */
+    .preset-black { background: #000000 !important; }
     .preset-white { background: #ffffff !important; }
     .preset-kraft {
       background-color: #f7efe3 !important;
@@ -213,8 +195,7 @@
     .preset-slate {
       background-color: #12161f !important;
       background-image: 
-        radial-gradient(circle at 50% 20%, #202736 0%, #10141c 70%, #090b10 100%),
-        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 2px) !important;
+        radial-gradient(circle at 50% 20%, #202736 0%, #10141c 70%, #090b10 100%) !important;
     }
     .preset-beauty {
       background-color: #fdf5f4 !important;
@@ -257,7 +238,6 @@
       text-align: center;
     }
 
-    /* Стили надписей */
     .main-title {
       font-weight: 800;
       letter-spacing: -0.5px;
@@ -295,7 +275,6 @@
       justify-content: space-between;
     }
 
-    /* Светлый режим для темных тем */
     .text-light .main-title {
       color: #ffffff !important;
       text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
@@ -313,7 +292,6 @@
       text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
     }
 
-    /* QR блок */
     .qr-wrapper {
       display: flex;
       justify-content: center;
@@ -322,9 +300,7 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
     }
 
-    .scan-hint-block {
-      width: 100%;
-    }
+    .scan-hint-block { width: 100%; }
 
     .logos-container {
       display: flex;
@@ -343,7 +319,6 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
-    /* Печать */
     @media print {
       @page {
         margin: 0;
@@ -359,15 +334,8 @@
         min-height: 100vh;
       }
 
-      .no-print {
-        display: none !important;
-      }
-
-      .cut-wrapper {
-        box-shadow: none !important;
-        padding: 0;
-      }
-
+      .no-print { display: none !important; }
+      .cut-wrapper { box-shadow: none !important; padding: 0; }
       .stand-card {
         box-shadow: none !important;
         margin: 0 auto;
@@ -381,7 +349,6 @@
 </head>
 <body>
 
-  <!-- Панель управления -->
   <div class="controls-panel no-print">
     <label>Формат полиграфии</label>
     <select id="formatSelect" onchange="changeFormat(this.value)">
@@ -393,12 +360,13 @@
 
     <label>Готовый стиль фона</label>
     <select id="presetSelect" onchange="applyPreset(this.value)">
-      <option value="preset-white" selected>Чистый минимализм (Белый)</option>
+      <option value="preset-black" selected>Глубокий чёрный (True Black #000000)</option>
+      <option value="preset-white">Чистый минимализм (Белый)</option>
       <option value="preset-kraft">Тёплый крафт (Пекарня / Кофейня)</option>
-      <option value="preset-slate">Тёмный сланец / Графит (Рестораны / Барбершопы)</option>
+      <option value="preset-slate">Тёмный сланец / Графит</option>
       <option value="preset-beauty">Пудровый мрамор (Салоны красоты / Спа)</option>
       <option value="preset-auto">Тёмный карбон (Автосервисы / Детейлинг)</option>
-      <option value="preset-med">Свежий ментол (Клиники / Аптеки / Стоматология)</option>
+      <option value="preset-med">Свежий ментол (Клиники / Стоматология)</option>
     </select>
 
     <label>Или загрузить свой фон</label>
@@ -411,26 +379,25 @@
 
     <label>Цвет надписей</label>
     <select id="textColorSelect" onchange="changeTextColor(this.value)">
-      <option value="dark" selected>Тёмный текст (для светлых фонов)</option>
-      <option value="light">Светлый текст (для тёмных фонов)</option>
+      <option value="light" selected>Светлый текст (для тёмных фонов)</option>
+      <option value="dark">Тёмный текст (для светлых фонов)</option>
     </select>
 
     <label>Номер стойки (ID)</label>
     <input type="text" id="inId" value="001" oninput="updateCard()">
 
     <div class="btn-row">
-      <button type="button" class="btn-action btn-reset" onclick="resetBg()">Сбросить к белому</button>
+      <button type="button" class="btn-action btn-reset" onclick="resetBg()">Сбросить к чёрному</button>
     </div>
 
     <button class="btn-print" onclick="window.print()">Распечатать макет</button>
   </div>
 
-  <!-- Макет карточки -->
   <div class="cut-wrapper">
-    <div class="stand-card format-10x15 preset-white" id="card">
+    <div class="stand-card format-10x15 preset-black" id="card">
       <div class="bg-overlay" id="overlay"></div>
 
-      <div class="card-content" id="cardContent">
+      <div class="card-content text-light" id="cardContent">
         <div>
           <div class="stars-box">★★★★★</div>
           <div class="main-title">Оцените<br>наш сервис</div>
@@ -472,11 +439,10 @@
   </div>
 
   <script>
-    const allPresets = ['preset-white', 'preset-kraft', 'preset-slate', 'preset-beauty', 'preset-auto', 'preset-med'];
+    const allPresets = ['preset-black', 'preset-white', 'preset-kraft', 'preset-slate', 'preset-beauty', 'preset-auto', 'preset-med'];
     const allFormats = ['format-10x15', 'format-a5', 'format-a4', 'format-a3'];
     let currentFormat = '10x15';
 
-    // Размеры QR-кода в пикселях под каждый формат
     const qrSizes = {
       '10x15': 165,
       'a5': 230,
@@ -500,7 +466,7 @@
       allPresets.forEach(cls => card.classList.remove(cls));
       card.classList.add(presetClass);
 
-      if (presetClass === 'preset-slate' || presetClass === 'preset-auto') {
+      if (presetClass === 'preset-black' || presetClass === 'preset-slate' || presetClass === 'preset-auto') {
         document.getElementById('textColorSelect').value = 'light';
         changeTextColor('light');
       } else {
@@ -537,8 +503,8 @@
     }
 
     function resetBg() {
-      document.getElementById('presetSelect').value = 'preset-white';
-      applyPreset('preset-white');
+      document.getElementById('presetSelect').value = 'preset-black';
+      applyPreset('preset-black');
       document.getElementById('dimRange').value = 0;
       changeDim(0);
     }
@@ -563,7 +529,6 @@
       });
     }
 
-    // Первоначальный запуск
     updateCard();
   </script>
 </body>
