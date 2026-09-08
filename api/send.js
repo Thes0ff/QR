@@ -9,7 +9,7 @@ module.exports = async function handler(req, res) {
     const GIST_ID = process.env.GIST_ID;
     const TG_BOT_TOKEN = process.env.TG_BOT_TOKEN;
     const VK_GROUP_TOKEN = process.env.VK_GROUP_TOKEN;
-    const WEB3FORMS_KEY = process.env.WEB3FORMS_KEY;
+    const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
     // 1. Получаем данные точки из GitHub Gist
     const gistRes = await fetch(`https://api.github.com/gists/${GIST_ID}`);
@@ -60,43 +60,28 @@ module.exports = async function handler(req, res) {
       );
     }
 
-    // 4. Отправка на Email (Web3Forms с защитой от сбоев парсера)
-    if (shop.targets?.email && WEB3FORMS_KEY) {
+    // 4. Отправка на Email (Resend API)
+    if (shop.targets?.email && RESEND_API_KEY) {
       requests.push(
-        fetch('https://api.web3forms.com/submit', {
+        fetch('https://api.resend.com/emails', {
           method: 'POST',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Origin': 'https://servis-kontrol.ru',
-            'Referer': 'https://servis-kontrol.ru/'
+            'Authorization': `Bearer ${RESEND_API_KEY.trim()}`
           },
           body: JSON.stringify({
-            access_key: WEB3FORMS_KEY.trim(),
-            name: "Служба контроля качества",
-            email: "report@servis-kontrol.ru",
+            from: 'Контроль Сервиса <onboarding@resend.dev>',
+            to: shop.targets.email,
             subject: `🚨 Жалоба: ${shopName}`,
-            message: text
+            text: text
           })
         })
         .then(async (r) => {
-          const raw = await r.text();
-          console.log('=== WEB3FORMS HTTP STATUS ===:', r.status);
-          try {
-            const data = JSON.parse(raw);
-            console.log('=== WEB3FORMS OK ===:', data);
-          } catch (e) {
-            console.log('=== WEB3FORMS HTML ===:', raw.slice(0, 300));
-          }
+          const data = await r.json();
+          console.log('=== RESEND STATUS ===:', r.status, data);
         })
-        .catch((err) => console.error('=== WEB3FORMS NETWORK ERROR ===:', err))
+        .catch((err) => console.error('=== RESEND ERROR ===:', err))
       );
-    } else {
-      console.log('Email не отправлен:', {
-        hasEmail: Boolean(shop.targets?.email),
-        hasKey: Boolean(WEB3FORMS_KEY)
-      });
     }
 
     await Promise.all(requests);
