@@ -2,596 +2,902 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Сервис Контроль — Умные QR и NFC стойки отзывов для бизнеса</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Сервис Контроль — Отзывы и NFC стойки для бизнеса</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: #38bdf8;
+      --accent: #38bdf8;
+      --accent-grad: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --star-glow: rgba(251, 191, 36, 0.45);
+      --danger-bg: rgba(244, 63, 94, 0.12);
+      --danger-border: rgba(244, 63, 94, 0.4);
+      --success: #34d399;
+    }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background-color: #0b0f19;
-      color: #f8fafc;
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.8) 0px, transparent 100%);
       min-height: 100vh;
+      color: var(--text);
       display: flex;
       flex-direction: column;
     }
 
+    /* Общие стили для анимаций */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
     /* ==========================================================
-       1. СТИЛИ ПРОДАЮЩЕГО ЛЕНДИНГА (когда зашли без ?id)
+       1. СТИЛИ ЛЕНДИНГА (servis-kontrol.ru без ID)
        ========================================================== */
-    #landing-view {
-      display: none;
+    
+    #landing-page {
+      display: none; /* Скрыт по умолчанию */
       flex-direction: column;
       align-items: center;
       width: 100%;
+      padding-bottom: 50px;
     }
 
-    .landing-header {
+    /* Шапка */
+    .header {
       width: 100%;
-      max-width: 1100px;
-      padding: 24px 20px;
+      max-width: 1200px;
+      padding: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: relative;
+      z-index: 10;
     }
 
-    .brand-logo {
+    .logo {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      text-decoration: none;
+      color: #fff;
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: #ffffff;
-      text-decoration: none;
+      gap: 8px;
     }
 
-    .brand-logo span {
-      background: linear-gradient(135deg, #38bdf8, #818cf8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .logo-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-grad);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent);
     }
 
-    .header-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #fff;
-      padding: 10px 18px;
+    .nav-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px;
       border-radius: 99px;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 600;
       text-decoration: none;
-      transition: all 0.2s ease;
+      transition: all 0.2s;
     }
+    .nav-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
 
-    .header-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-    }
-
-    .hero-section {
-      width: 100%;
-      max-width: 900px;
-      padding: 60px 20px 40px;
+    /* Главная секция */
+    .hero {
+      max-width: 800px;
       text-align: center;
+      padding: 80px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      animation: fadeIn 0.8s ease;
     }
 
-    .badge-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      border-radius: 99px;
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      color: #38bdf8;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 24px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .hero-title {
-      font-size: 40px;
-      line-height: 1.18;
+    .hero h1 {
+      font-size: 48px;
       font-weight: 800;
-      letter-spacing: -1px;
+      letter-spacing: -2px;
+      line-height: 1.1;
       margin-bottom: 20px;
-    }
-
-    .hero-title span {
-      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .hero-desc {
-      font-size: 17px;
-      color: #94a3b8;
+    .hero h1 span {
+      background: var(--accent-grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(56, 189, 248, 0.5);
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--text-muted);
       line-height: 1.6;
-      max-width: 640px;
-      margin-bottom: 34px;
+      margin-bottom: 40px;
+      max-width: 600px;
     }
 
-    .cta-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      justify-content: center;
-      margin-bottom: 50px;
-    }
-
-    .btn-primary {
-      background: #38bdf8;
-      color: #0b0f19;
-      padding: 15px 28px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 800;
+    /* Кнопки */
+    .btn-main {
+      background: var(--accent-grad);
+      color: #0f172a;
+      padding: 16px 32px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 700;
       text-decoration: none;
-      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.35);
+      box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.4);
       transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
-    .btn-primary:hover {
-      background: #7dd3fc;
+    .btn-main:hover {
+      opacity: 0.9;
       transform: translateY(-2px);
+      box-shadow: 0 12px 24px -5px rgba(56, 189, 248, 0.5);
     }
 
-    .btn-secondary {
-      background: #161e2e;
-      color: #f8fafc;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 15px 26px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: all 0.2s ease;
-    }
-
-    .btn-secondary:hover {
-      background: #1f293d;
-    }
-
-    /* Блок преимуществ */
-    .features-grid {
+    /* Сетка преимуществ */
+    .features {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 20px;
       width: 100%;
-      max-width: 1000px;
-      padding: 0 20px 60px;
-    }
-
-    .feature-card {
-      background: #121826;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 18px;
-      padding: 26px;
-      text-align: left;
-    }
-
-    .feature-icon {
-      font-size: 26px;
-      margin-bottom: 14px;
-    }
-
-    .feature-card h3 {
-      font-size: 17px;
-      font-weight: 800;
-      margin-bottom: 8px;
-      color: #ffffff;
-    }
-
-    .feature-card p {
-      font-size: 14px;
-      color: #94a3b8;
-      line-height: 1.5;
-    }
-
-    .landing-footer {
-      margin-top: auto;
-      width: 100%;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 24px 20px;
-      text-align: center;
-      font-size: 12px;
-      color: #64748b;
-    }
-
-    /* ==========================================================
-       2. СТИЛИ ЭКРАНА ОТЗЫВА ДЛЯ ГОСТЯ (когда перешли по ?id=...)
-       ========================================================== */
-    #review-view {
-      display: none;
-      flex: 1;
-      justify-content: center;
-      align-items: center;
+      max-width: 1100px;
       padding: 20px;
     }
 
-    .review-card {
-      background: #121826;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+    .l-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      padding: 30px;
       border-radius: 24px;
-      padding: 32px 24px;
-      width: 100%;
-      max-width: 380px;
-      text-align: center;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
     }
 
-    .review-badge {
-      display: inline-flex;
+    .l-card:hover {
+      border-color: rgba(56, 189, 248, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+    }
+
+    .l-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; width: 100%; height: 2px;
+      background: var(--accent-grad);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .l-card:hover::before { opacity: 1; }
+
+    .icon-box {
+      width: 50px;
+      height: 50px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 14px;
+      display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 4px 12px;
-      border-radius: 99px;
-      background: rgba(56, 189, 248, 0.12);
-      color: #38bdf8;
-      font-size: 11px;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: var(--accent);
+      font-size: 20px;
+    }
+
+    .l-card h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 16px;
     }
 
-    .store-title {
-      font-size: 22px;
-      font-weight: 800;
-      margin-bottom: 6px;
-      color: #ffffff;
+    .l-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
     }
 
-    .store-subtitle {
-      font-size: 13px;
-      color: #94a3b8;
-      margin-bottom: 24px;
-      line-height: 1.4;
+    /* Демо-секция */
+    .demo-section {
+      width: 100%;
+      max-width: 1100px;
+      padding: 80px 20px;
+      text-align: center;
     }
 
-    /* Интерактивные звёзды */
-    .stars-rating {
+    .demo-container {
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 20px;
       display: flex;
       justify-content: center;
+      align-items: center;
+      margin-top: 40px;
+      position: relative;
+    }
+    
+    .demo-container::after {
+        content:'ДЕМО-ЗОНА';
+        position: absolute;
+        top: -10px;
+        background: #090d16;
+        padding: 0 10px;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--accent);
+        letter-spacing: 1px;
+    }
+
+    /* Адаптивность лендинга */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 34px; letter-spacing: -1px; }
+      .hero p { font-size: 16px; }
+      .hero { padding: 60px 16px; }
+    }
+
+    /* ==========================================================
+       2. ВОССТАНОВЛЕННЫЕ СТИЛИ ВИДЖЕТА (servis-kontrol.ru?id=...)
+       ========================================================== */
+    
+    #widget-page {
+      display: none; /* Скрыт по умолчанию */
+      justify-content: center;
+      align-items: center;
+      padding: 20px 16px;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    .widget-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      width: 100%;
+      max-width: 420px;
+      border-radius: 28px;
+      padding: 34px 26px;
+      border: 1px solid var(--border);
+      box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: fadeIn 0.5s ease;
+    }
+
+    .widget-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 15%;
+      right: 15%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), transparent);
+    }
+
+    .top-badge {
+      display: inline-flex;
+      align-items: center;
       gap: 8px;
-      margin-bottom: 24px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      color: var(--accent);
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .badge-glow {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    .widget-card h1 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      line-height: 1.25;
+      margin-bottom: 8px;
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 30px;
+    }
+
+    .rating-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
+    .stars-box {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
     }
 
     .star-btn {
-      font-size: 34px;
-      color: #334155;
-      cursor: pointer;
       background: none;
       border: none;
-      transition: all 0.15s ease;
-      line-height: 1;
+      cursor: pointer;
       padding: 4px;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .star-btn.active {
-      color: #f59e0b;
-      transform: scale(1.1);
+    .star-icon {
+      width: 44px;
+      height: 44px;
+      fill: #1e293b;
+      stroke: #334155;
+      stroke-width: 1.5;
+      transition: all 0.25s ease;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
     }
 
-    /* Блок для оценки 5★ */
-    .happy-box {
-      display: none;
-      animation: fadeIn 0.3s ease;
+    .star-btn.active .star-icon {
+      fill: #fbbf24;
+      stroke: #f59e0b;
+      filter: drop-shadow(0 0 14px var(--star-glow));
     }
 
-    .happy-box p {
+    .star-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .rating-pill {
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 16px;
+      border-radius: 99px;
       font-size: 14px;
-      color: #cbd5e1;
-      margin-bottom: 16px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
     }
 
-    .maps-btn-group {
+    .complaint-section {
+      display: none;
+      margin-top: 24px;
+      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .tag-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .tags-grid {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
     }
 
-    .map-link-btn {
+    .tag-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+
+    .tag-item.selected {
+      background: var(--danger-bg);
+      border-color: var(--danger-border);
+      color: #fda4af;
+      font-weight: 600;
+    }
+
+    textarea, input {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 14px;
+      color: #fff;
+      outline: none;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+
+    textarea:focus, input:focus {
+      border-color: var(--border-focus);
+      background: rgba(15, 23, 42, 0.9);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--accent-grad);
+      color: #0f172a;
+      border: none;
+      padding: 16px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn-submit:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    .status-screen {
+      display: none;
+      text-align: center;
+      padding: 24px 8px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(56, 189, 248, 0.15);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      animation: spin 1s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite;
+    }
+
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .check-icon {
+      width: 58px;
+      height: 58px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      padding: 13px;
-      border-radius: 12px;
-      font-size: 14px;
+      font-size: 26px;
+      margin: 0 auto 20px;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    }
+
+    .maps-choice-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn-map {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 14px;
+      font-size: 15px;
       font-weight: 700;
       text-decoration: none;
-      color: #fff;
       transition: all 0.2s ease;
+      cursor: pointer;
     }
 
     .btn-yandex {
       background: #fc3f1d;
-    }
-    .btn-yandex:hover {
-      background: #e03212;
+      color: #ffffff;
+      box-shadow: 0 8px 18px -4px rgba(252, 63, 29, 0.4);
     }
 
     .btn-2gis {
-      background: #189e28;
-    }
-    .btn-2gis:hover {
-      background: #12821f;
-    }
-
-    /* Блок для оценки 1-4★ (перехват негатива) */
-    .complaint-box {
-      display: none;
-      text-align: left;
-      animation: fadeIn 0.3s ease;
+      background: #00a651;
+      color: #ffffff;
+      box-shadow: 0 8px 18px -4px rgba(0, 166, 81, 0.4);
     }
 
-    .complaint-box label {
-      display: block;
-      font-size: 12px;
-      font-weight: 700;
-      color: #cbd5e1;
-      margin-bottom: 6px;
-    }
-
-    .complaint-textarea {
-      width: 100%;
-      height: 90px;
-      background: #0b0f19;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-      padding: 10px 12px;
-      color: #fff;
-      font-size: 13px;
-      resize: none;
-      outline: none;
-      margin-bottom: 12px;
-    }
-
-    .complaint-input {
-      width: 100%;
-      background: #0b0f19;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-      padding: 10px 12px;
-      color: #fff;
-      font-size: 13px;
-      outline: none;
-      margin-bottom: 14px;
-    }
-
-    .btn-submit-complaint {
-      width: 100%;
-      background: #38bdf8;
-      color: #0b0f19;
-      border: none;
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 600px) {
-      .hero-title { font-size: 30px; }
-      .hero-desc { font-size: 15px; }
-      .hero-section { padding: 40px 16px 30px; }
+    .btn-map:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
     }
   </style>
 </head>
 <body>
 
-  <!-- ==========================================================
-       1. ВИТРИНА / ЛЕНДИНГ (Отображается, если зашли без ?id)
-       ========================================================== -->
-  <div id="landing-view">
-    <header class="landing-header">
-      <a href="/" class="brand-logo">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2C7.03 2 3 6.03 3 11C3 16.55 10.5 22.4 11.4 23.08C11.75 23.35 12.25 23.35 12.6 23.08C13.5 22.4 21 16.55 21 11C21 6.03 16.97 2 12 2Z" fill="#38bdf8"/>
-          <circle cx="12" cy="11" r="3.5" fill="#0b0f19"/>
-        </svg>
-        Сервис<span>Контроль</span>
-      </a>
-      <a href="https://t.me/YOUR_TELEGRAM_USERNAME" target="_blank" class="header-btn">Связаться</a>
-    </header>
+<!-- ==========================================================
+     БЛОК 1: ЛЕНДИНГ (servis-kontrol.ru)
+     ========================================================== -->
+<div id="landing-page">
+  <header class="header">
+    <a href="#" class="logo">
+      <div class="logo-dot"></div>
+      Сервис<span>Контроль</span>
+    </a>
+    <a href="#demo" class="nav-btn">Демо</a>
+  </header>
 
-    <section class="hero-section">
-      <div class="badge-pill">★ Умные NFC & QR стойки для отзывов</div>
-      <h1 class="hero-title">
-        Увеличьте рейтинг до 5.0<br>и <span>перехватывайте негатив</span>
-      </h1>
-      <p class="hero-desc">
-        Настольные стойки для кассы и столиков. Довольные гости оставляют отзывы на Яндекс Картах и 2ГИС в 1 касание, а жалобы приходят лично вам в Telegram, минуя публичные карты.
-      </p>
+  <section class="hero">
+    <h1>Честные отзывы<br>для <span>Вашего бизнеса</span></h1>
+    <p>NFC-стойки и QR-коды, которые фильтруют негатив. Получайте 5 звёзд на карты, а жалобы — напрямую в Telegram директора.</p>
+    <a href="https://t.me/your_manager" class="btn-main">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      Подключить тариф
+    </a>
+  </section>
 
-      <div class="cta-group">
-        <!-- Укажите вашу ссылку на Telegram или WhatsApp для заявок -->
-        <a href="https://t.me/YOUR_TELEGRAM_USERNAME" target="_blank" class="btn-primary">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
-          </svg>
-          Заказать стойку для бизнеса
-        </a>
-        <a href="/?id=demo" class="btn-secondary">Попробовать живое демо</a>
-      </div>
-    </section>
-
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">🛡️</div>
-        <h3>Фильтр негатива</h3>
-        <p>Гости с оценкой 1–4 звезды пишут жалобу напрямую руководству. Негатив остаётся внутри заведения и не портит профиль на картах.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <h3>NFC в одно касание</h3>
-        <p>Гостю не нужно сканировать или искать заведение на картах — достаточно просто приложить смартфон к стойке.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">🪵</div>
-        <h3>Премиальный вид</h3>
-        <p>Стильный ударопрочный акрил на массивном деревянном основании из натурального ясеня идеально украшает кассовую зону.</p>
-      </div>
+  <section class="features">
+    <div class="l-card">
+      <div class="icon-box">📢</div>
+      <h3>Рост рейтинга</h3>
+      <p>Просим довольных клиентов оставить отзыв на Яндекс.Картах, Google или 2ГИС.</p>
     </div>
-
-    <footer class="landing-footer">
-      © 2026 servis-kontrol.ru — Автоматизация сбора отзывов и контроль качества сервиса.
-    </footer>
-  </div>
-
-
-  <!-- ==========================================================
-       2. ЭКРАН ОТЗЫВА (Отображается гостю, если есть ?id=...)
-       ========================================================== -->
-  <div id="review-view">
-    <div class="review-card">
-      <div class="review-badge">Служба заботы о гостях</div>
-      <h2 class="store-title" id="dispStoreName">Оцените визит</h2>
-      <p class="store-subtitle" id="dispStoreSub">Поставьте оценку от 1 до 5 звезд</p>
-
-      <!-- Интерактивный рейтинг -->
-      <div class="stars-rating" id="starsBox">
-        <button class="star-btn" onclick="rate(1)">★</button>
-        <button class="star-btn" onclick="rate(2)">★</button>
-        <button class="star-btn" onclick="rate(3)">★</button>
-        <button class="star-btn" onclick="rate(4)">★</button>
-        <button class="star-btn" onclick="rate(5)">★</button>
+    <div class="l-card">
+      <div class="icon-box">🤫</div>
+      <h3>Перехват негатива</h3>
+      <p>Если клиенту не понравилось, форма предложит написать директору, а не на карты.</p>
+    </div>
+    <div class="l-card">
+      <div class="icon-box">⚡</div>
+      <h3>NFC технологии</h3>
+      <p>Клиенту достаточно приложить телефон к стойке — форма откроется мгновенно.</p>
+    </div>
+  </section>
+    
+  <section id="demo" class="demo-section">
+      <div class="top-badge">
+        <span class="badge-glow"></span>
+        Как это выглядит
       </div>
+      <h2>Простая механика</h2>
+      <p style="color:var(--text-muted); margin-top:10px;">Нажмите на звёзды в виджете ниже, чтобы проверить сценарии (4-5 звёзд — карты, 1-3 — форма жалобы)</p>
+      
+      <div class="demo-container">
+          <!-- Сюда скрипт вставит клон виджета для демо -->
+      </div>
+  </section>
 
-      <!-- Ветка: 5 ЗВЁЗД -> Переход на Яндекс/2ГИС -->
-      <div class="happy-box" id="happyBox">
-        <p>Спасибо за высокую оценку! Опубликуйте отзыв на удобной для вас карте:</p>
-        <div class="maps-btn-group">
-          <a href="#" id="yandexLink" target="_blank" class="map-link-btn btn-yandex">
-            Оставить отзыв на Яндекс Картах
-          </a>
-          <a href="#" id="gisLink" target="_blank" class="map-link-btn btn-2gis">
-            Оставить отзыв в 2ГИС
-          </a>
+</div>
+
+<!-- ==========================================================
+     БЛОК 2: ВОССТАНОВЛЕННЫЙ ВИДЖЕТ (с ID)
+     ========================================================== -->
+<div id="widget-page">
+  <div class="widget-card" id="widgetCard">
+    <!-- Основной экран -->
+    <div id="mainFields">
+      <div id="headerBox">
+        <div class="top-badge">
+          <span class="badge-glow"></span>
+          Служба сервиса
         </div>
+        <h1 id="shopName">Оцените обслуживание</h1>
+        <p class="subtitle" id="subTitle">Ваш отзыв направляется напрямую руководству заведения</p>
       </div>
 
-      <!-- Ветка: 1-4 ЗВЕЗДЫ -> Перехват негатива -->
-      <div class="complaint-box" id="complaintBox">
-        <label>Что нам исправить?</label>
-        <textarea class="complaint-textarea" id="complaintText" placeholder="Напишите, что пошло не так..."></textarea>
-        
-        <label>Ваш телефон или Telegram для ответа</label>
-        <input type="text" class="complaint-input" id="complaintContact" placeholder="+7 (___) ___-__-__">
-
-        <button class="btn-submit-complaint" onclick="sendComplaint()">Отправить директору</button>
+      <div class="rating-container" id="ratingBox">
+        <div class="stars-box">
+          <button class="star-btn" data-val="1">
+            <svg class="star-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+          <button class="star-btn" data-val="2">
+            <svg class="star-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+          <button class="star-btn" data-val="3">
+            <svg class="star-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+          <button class="star-btn" data-val="4">
+            <svg class="star-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+          <button class="star-btn" data-val="5">
+            <svg class="star-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+        </div>
+        <div class="rating-pill" id="ratingText">Поставьте оценку</div>
       </div>
     </div>
+
+    <!-- Экраны состояний (скрыты) -->
+    
+    <!-- Перенаправление -->
+    <div class="status-screen" id="redirectBlock">
+      <div class="spinner"></div>
+      <h2 style="font-size: 19px; margin-bottom: 6px;">Спасибо за оценку!</h2>
+      <p style="color: var(--text-muted); font-size: 14px;">Перенаправляем на карту...</p>
+    </div>
+
+    <!-- Выбор карт -->
+    <div class="status-screen" id="chooseMapBlock">
+      <div class="check-icon">⭐</div>
+      <h2 style="font-size: 20px; margin-bottom: 6px;">Спасибо за визит!</h2>
+      <p style="color: var(--text-muted); font-size: 14px;">Где вам удобнее оставить отзыв?</p>
+      <div class="maps-choice-grid">
+        <a id="btnYandex" href="#" class="btn-map btn-yandex" target="_blank">Яндекс.Карты</a>
+        <a id="btn2Gis" href="#" class="btn-map btn-2gis" target="_blank">2ГИС</a>
+      </div>
+    </div>
+
+    <!-- Форма негатива -->
+    <div class="complaint-section" id="negativeForm">
+      <div class="tag-title">Что вызвало неудобство?</div>
+      <div class="tags-grid">
+        <div class="tag-item">Долгое ожидание</div>
+        <div class="tag-item">Грубый персонал</div>
+        <div class="tag-item">Качество товара</div>
+        <div class="tag-item">Завышенная цена</div>
+        <div class="tag-item">Чистота зала</div>
+      </div>
+      <textarea id="comment" rows="3" placeholder="Расскажите подробнее, что нужно исправить..."></textarea>
+      <input type="tel" id="phone" placeholder="Ваш телефон для ответа дирекции (по желанию)">
+      <button class="btn-submit" id="btnSend">Отправить директору</button>
+    </div>
+
+    <!-- Успех отправки -->
+    <div class="status-screen" id="successBlock">
+      <div class="check-icon">✓</div>
+      <h2 style="font-size: 20px; margin-bottom: 6px;">Сообщение передано</h2>
+      <p style="color: var(--text-muted); font-size: 14px; line-height: 1.5;">Спасибо! Руководство точки уже уведомлено и примет меры.</p>
+    </div>
   </div>
+</div>
+
+<script>
+  // Основная логика роутинга и инициализации виджета
+  const GIST_ID = "052f7c277f6e1fc78a305e81e2135f65";
+  const urlParams = new URLSearchParams(window.location.search);
+  const shopId = urlParams.get('id');
+
+  // Элементы страниц
+  const landingPage = document.getElementById('landing-page');
+  const widgetPage = document.getElementById('widget-page');
+  const demoContainer = document.querySelector('.demo-container');
+  const widgetCardMaster = document.getElementById('widgetCard');
+
+  // ЛЕЙБЛЫ ОЦЕНОК (восстановлены)
+  const ratingLabels = {
+    1: "😡 Ужасный сервис",
+    2: "🙁 Не понравилось",
+    3: "😐 Есть замечания",
+    4: "🙂 Хорошо",
+    5: "🔥 Превосходно!"
+  };
+
+  // 1. РОУТИНГ: Лендинг или Виджет
+  if (!shopId) {
+    // Показываем лендинг
+    landingPage.style.display = 'flex';
+    document.title = "Сервис Контроль — Подключение бизнеса";
+    
+    // Создаем ДЕМО-версию виджета внутри лендинга
+    const demoWidget = widgetCardMaster.cloneNode(true);
+    demoWidget.id = "demoWidgetCard";
+    // Убираем outline т.к. стиль лендинга немного другой
+    demoWidget.style.outline = 'none'; 
+    demoWidget.style.boxShadow = 'none';
+    demoWidget.style.background = 'transparent';
+    demoContainer.appendChild(demoWidget);
+    
+    // Инициализируем логику для демо-виджета
+    initWidgetLogic(demoWidget, true);
+
+  } else {
+    // Показываем реальный виджет
+    widgetPage.style.display = 'flex';
+    initWidgetLogic(widgetCardMaster, false, shopId);
+  }
 
 
-  <script>
-    // URL вашего GitHub Gist с базой магазинов (stores.json)
-    const GIST_URL = "https://gist.githubusercontent.com/ВАШ_ЛОГИН/ВАШ_GIST_ID/raw/stores.json";
+  // 2. ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ ЛОГИКИ ВИДЖЕТА (универсальная для демо и реала)
+  function initWidgetLogic(cardEl, isDemo = false, id = null) {
+    let shopConfig = null;
+    let selectedRating = 0;
+    let selectedTags = [];
 
-    // Демо-данные для ссылки ?id=demo
-    const demoData = {
-      name: "Кафе «Уютная Пекарня»",
-      yandex: "https://yandex.ru/maps",
-      gis: "https://2gis.ru"
-    };
+    // Элементы внутри конкретной карточки (cardEl)
+    const shopNameEl = cardEl.querySelector('#shopName');
+    const ratingBox = cardEl.querySelector('#ratingBox');
+    const headerBox = cardEl.querySelector('#headerBox');
+    const ratingTextPill = cardEl.querySelector('#ratingText');
+    const starsButtons = cardEl.querySelectorAll('.star-btn');
+    
+    const redirectBlock = cardEl.querySelector('#redirectBlock');
+    const chooseMapBlock = cardEl.querySelector('#chooseMapBlock');
+    const btnYandex = cardEl.querySelector('#btnYandex');
+    const btn2Gis = cardEl.querySelector('#btn2Gis');
+    
+    const negativeForm = cardEl.querySelector('#negativeForm');
+    const tagsItems = cardEl.querySelectorAll('.tag-item');
+    const btnSend = cardEl.querySelector('#btnSend');
+    const successBlock = cardEl.querySelector('#successBlock');
 
-    let currentStore = null;
-
-    async function init() {
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get('id');
-
-      // 1. ЕСЛИ НЕТ ID В URL -> ПОКАЗЫВАЕМ ПРОДАЮЩИЙ ЛЕНДИНГ
-      if (!id) {
-        document.getElementById('landing-view').style.display = 'flex';
-        return;
-      }
-
-      // 2. ЕСЛИ ЕСТЬ ID -> ПОКАЗЫВАЕМ ЭКРАН ГОСТЯ
-      document.getElementById('review-view').style.display = 'flex';
-
-      if (id === 'demo') {
-        applyStoreData(demoData);
-        return;
-      }
-
-      // Загрузка реальных данных из базы
-      try {
-        const res = await fetch(GIST_URL + '?t=' + Date.now());
-        const db = await res.json();
-        if (db[id]) {
-          applyStoreData(db[id]);
-        } else {
-          document.getElementById('dispStoreName').innerText = "Точка не найдена";
-          document.getElementById('dispStoreSub').innerText = `Стойка № ${id} пока не активирована в системе.`;
+    // Загрузка конфига (только если не демо)
+    if (!isDemo && id) {
+      fetch(`https://api.github.com/gists/${GIST_ID}`)
+        .then(r => r.json())
+        .then(data => {
+          const shops = JSON.parse(data.files['shops.json'].content || '{}');
+          if (shops[id]) {
+            shopConfig = shops[id];
+            shopNameEl.innerText = shopConfig.name;
+            document.title = `Отзыв: ${shopConfig.name}`;
+          }
+        })
+        .catch(err => console.error("Ошибка загрузки точки:", err));
+    } else if (isDemo) {
+        shopNameEl.innerText = "Демо-заведение";
+        // Хардкодим ссылки для демо
+        shopConfig = {
+            name: "Демо-заведение",
+            yandex_url: "https://ya.ru",
+            gis_url: "https://2gis.ru"
         }
-      } catch (err) {
-        document.getElementById('dispStoreName').innerText = "Контроль сервиса";
-      }
     }
 
-    function applyStoreData(data) {
-      currentStore = data;
-      document.getElementById('dispStoreName').innerText = data.name || "Оцените сервис";
-      document.getElementById('yandexLink').href = data.yandex || "https://yandex.ru/maps";
-      document.getElementById('gisLink').href = data.gis || "https://2gis.ru";
-    }
+    // Логика звёзд (восстановлена полностью)
+    starsButtons.forEach((btn, idx) => {
+      btn.addEventListener('click', () => {
+        selectedRating = idx + 1;
+        
+        // Обновляем пилюлю текста
+        ratingTextPill.innerText = ratingLabels[selectedRating];
+        ratingTextPill.style.color = selectedRating >= 4 ? '#38bdf8' : '#fda4af';
+        ratingTextPill.style.background = selectedRating >= 4 ? 'rgba(56,189,248,0.1)' : 'rgba(244,63,94,0.1)';
 
-    function rate(score) {
-      const btns = document.querySelectorAll('.star-btn');
-      btns.forEach((b, idx) => {
-        if (idx < score) b.classList.add('active');
-        else b.classList.remove('active');
+        // Визуализация звёзд
+        starsButtons.forEach((b, i) => {
+          b.classList.toggle('active', i <= idx);
+        });
+
+        // Сценарии
+        if (selectedRating >= 4) {
+          // ПОЗИТИВ (4-5)
+          ratingBox.style.display = 'none';
+          negativeForm.style.display = 'none'; // На всякий случай скрываем форму если была
+
+          if (isDemo) {
+              headerBox.style.display = 'none';
+              btnYandex.href = shopConfig.yandex_url;
+              btn2Gis.href = shopConfig.gis_url;
+              chooseMapBlock.style.display = 'block';
+              return;
+          }
+
+          if (!shopConfig) return; // Ждем загрузки конфига
+
+          headerBox.style.display = 'none';
+          const yaUrl = shopConfig.yandex_url || shopConfig.maps_url;
+          const gisUrl = shopConfig.gis_url;
+
+          if (yaUrl && gisUrl) {
+            btnYandex.href = yaUrl;
+            btn2Gis.href = gisUrl;
+            chooseMapBlock.style.display = 'block';
+          } else {
+            const targetUrl = yaUrl || gisUrl || 'https://yandex.ru/maps';
+            redirectBlock.style.display = 'block';
+            setTimeout(() => { window.location.href = targetUrl; }, 1000);
+          }
+        } else {
+          // НЕГАТИВ (1-3)
+          chooseMapBlock.style.display = 'none';
+          redirectBlock.style.display = 'none';
+          negativeForm.style.display = 'block';
+        }
       });
+    });
 
-      if (score === 5) {
-        document.getElementById('complaintBox').style.display = 'none';
-        document.getElementById('happyBox').style.display = 'block';
-      } else {
-        document.getElementById('happyBox').style.display = 'none';
-        document.getElementById('complaintBox').style.display = 'block';
-      }
+    // Логика тегов (восстановлена)
+    tagsItems.forEach(tag => {
+        tag.addEventListener('click', () => {
+            tag.classList.toggle('selected');
+            const text = tag.innerText;
+            if (selectedTags.includes(text)) {
+                selectedTags = selectedTags.filter(t => t !== text);
+            } else {
+                selectedTags.push(text);
+            }
+        });
+    });
+
+    // Логика отправки (восстановлена)
+    if (btnSend) {
+        btnSend.addEventListener('click', async () => {
+            const comment = cardEl.querySelector('#comment').value.trim();
+            const phone = cardEl.querySelector('#phone').value.trim();
+
+            if (isDemo) {
+                // В демо просто показываем успех
+                headerBox.style.display = 'none';
+                ratingBox.style.display = 'none';
+                negativeForm.style.display = 'none';
+                successBlock.style.display = 'block';
+                return;
+            }
+
+            // Реальная отправка
+            btnSend.disabled = true;
+            btnSend.innerText = "Отправка...";
+
+            try {
+                await fetch('/api/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        shopId: id,
+                        rating: selectedRating,
+                        tags: selectedTags,
+                        comment: comment,
+                        phone: phone
+                    })
+                });
+            } catch (e) { console.error("Сетевая ошибка:", e); }
+
+            headerBox.style.display = 'none';
+            ratingBox.style.display = 'none';
+            negativeForm.style.display = 'none';
+            successBlock.style.display = 'block';
+        });
     }
+  }
+</script>
 
-    function sendComplaint() {
-      const text = document.getElementById('complaintText').value.trim();
-      const contact = document.getElementById('complaintContact').value.trim();
-
-      if (!text) {
-        alert("Пожалуйста, расскажите кратко о проблеме.");
-        return;
-      }
-
-      // Здесь данные уходят владельцу (в Telegram бот или на почту)
-      alert("Спасибо! Ваше обращение передано руководству заведения. Мы разберёмся в ситуации.");
-      location.reload();
-    }
-
-    init();
-  </script>
 </body>
 </html>
