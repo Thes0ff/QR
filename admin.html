@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Активация стойки</title>
+  <title>Активация стойки — Панель управления</title>
   <style>
     :root {
       --bg: #090d16;
@@ -50,6 +50,36 @@
       padding: 30px 24px;
       border: 1px solid var(--border);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .top-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      color: var(--accent);
+      padding: 5px 12px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .badge-glow {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent);
     }
 
     h2 {
@@ -57,6 +87,29 @@
       font-weight: 700;
       letter-spacing: -0.3px;
       margin-bottom: 18px;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .btn-logout {
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      color: #fda4af;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-logout:hover {
+      background: rgba(244, 63, 94, 0.22);
     }
 
     details {
@@ -105,6 +158,26 @@
       border-color: var(--border-focus);
       background: rgba(15, 23, 42, 0.9);
       box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+
+    .remember-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .remember-row input {
+      width: auto;
+      margin-bottom: 0;
+      cursor: pointer;
+    }
+
+    .remember-row span {
+      font-size: 13px;
+      color: var(--text-muted);
     }
 
     .channels-card {
@@ -219,172 +292,303 @@
 </head>
 <body>
 
-<div class="card">
-  <h2>Активация стойки</h2>
-
-  <details>
-    <summary>▼ Ключи доступа (ввести один раз)</summary>
-    <div class="keys-box">
-      <label>GitHub Gist ID</label>
-      <input type="text" id="gistId" placeholder="Хеш из адресной строки Gist">
-
-      <label>GitHub Personal Token</label>
-      <input type="password" id="ghToken" placeholder="ghp_...">
+  <!-- ==========================================================
+       ЭКРАН 1: АВТОРИЗАЦИЯ (Проверка через Vercel API)
+       ========================================================== -->
+  <div class="card" id="authCard" style="display: none;">
+    <div class="top-badge">
+      <span class="badge-glow"></span>
+      Доступ ограничен
     </div>
-  </details>
+    <h2>Вход в панель</h2>
+    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px;">
+      Для активации стоек введите мастер-пароль администратора:
+    </p>
 
-  <label>Номер стойки (ID из QR)</label>
-  <input type="text" id="shopId" placeholder="Например: 001">
+    <label>Мастер-пароль</label>
+    <input type="password" id="adminPassInput" placeholder="••••••••" onkeydown="if(event.key==='Enter') checkAuth()">
 
-  <label>Название точки</label>
-  <input type="text" id="shopName" placeholder="Кофейня «Утро»">
+    <label class="remember-row">
+      <input type="checkbox" id="rememberMe" checked>
+      <span>Запомнить меня на этом устройстве</span>
+    </label>
 
-  <label>Ссылка на Яндекс.Карты</label>
-  <input type="url" id="yandexUrl" placeholder="https://yandex.ru/maps/org/...">
-
-  <label>Ссылка на 2ГИС</label>
-  <input type="url" id="gisUrl" placeholder="https://2gis.ru/...">
-
-  <div class="channels-card">
-    <div class="channels-header">
-      <span class="channels-title">Куда слать негатив</span>
-      <span class="channels-hint">Заполните нужные</span>
-    </div>
-
-    <label>Telegram (Chat ID)</label>
-    <input type="text" id="targetTg" placeholder="Например: 423133556">
-
-    <label>ВКонтакте (VK User ID)</label>
-    <input type="text" id="targetVk" placeholder="Например: 74829102">
-
-    <label>Электронная почта (Email)</label>
-    <input type="email" id="targetEmail" placeholder="director@company.ru">
+    <button class="btn-submit" id="btnAuth" onclick="checkAuth()">Войти в управление</button>
+    <div id="authError" class="status-box status-err" style="margin-top: 14px;"></div>
   </div>
 
-  <button class="btn-submit" id="btnSave" onclick="saveShop()">Привязать стойку</button>
-  <div id="statusBox" class="status-box"></div>
-</div>
 
-<script>
-  document.getElementById('gistId').value = localStorage.getItem('cfg_gist_id') || '';
-  document.getElementById('ghToken').value = localStorage.getItem('cfg_gh_token') || '';
+  <!-- ==========================================================
+       ЭКРАН 2: ПАНЕЛЬ УПРАВЛЕНИЯ (Открывается после проверки)
+       ========================================================== -->
+  <div class="card" id="mainAdminCard" style="display: none;">
+    <div class="header-row">
+      <div class="top-badge" style="margin-bottom: 0;">
+        <span class="badge-glow"></span>
+        Сервис Контроль
+      </div>
+      <button class="btn-logout" onclick="logoutAdmin()">Выйти</button>
+    </div>
 
-  async function saveShop() {
-    const status = document.getElementById('statusBox');
-    const btn = document.getElementById('btnSave');
-    status.style.display = 'none';
+    <h2>Активация стойки</h2>
 
-    const gistId = document.getElementById('gistId').value.trim();
-    const token = document.getElementById('ghToken').value.trim();
-    const shopId = document.getElementById('shopId').value.trim();
-    const name = document.getElementById('shopName').value.trim();
-    const yandexUrl = document.getElementById('yandexUrl').value.trim();
-    const gisUrl = document.getElementById('gisUrl').value.trim();
+    <details>
+      <summary>▼ Ключи доступа (ввести один раз)</summary>
+      <div class="keys-box">
+        <label>GitHub Gist ID</label>
+        <input type="text" id="gistId" placeholder="Хеш из адресной строки Gist">
 
-    const targetTg = document.getElementById('targetTg').value.trim();
-    const targetVk = document.getElementById('targetVk').value.trim();
-    const targetEmail = document.getElementById('targetEmail').value.trim();
+        <label>GitHub Personal Token</label>
+        <input type="password" id="ghToken" placeholder="ghp_...">
+      </div>
+    </details>
 
-    if (!gistId || !token || !shopId || !name) {
-      showMessage('Заполните номер и название точки!', false);
-      return;
-    }
+    <label>Номер стойки (ID из QR)</label>
+    <input type="text" id="shopId" placeholder="Например: 001">
 
-    if (!yandexUrl && !gisUrl) {
-      showMessage('Укажите хотя бы одну ссылку на карты (Яндекс или 2ГИС)!', false);
-      return;
-    }
+    <label>Название точки</label>
+    <input type="text" id="shopName" placeholder="Кофейня «Утро»">
 
-    if (!targetTg && !targetVk && !targetEmail) {
-      showMessage('Укажите хотя бы один канал (Telegram, VK или Email)!', false);
-      return;
-    }
+    <label>Ссылка на Яндекс.Карты</label>
+    <input type="url" id="yandexUrl" placeholder="https://yandex.ru/maps/org/...">
 
-    localStorage.setItem('cfg_gist_id', gistId);
-    localStorage.setItem('cfg_gh_token', token);
+    <label>Ссылка на 2ГИС</label>
+    <input type="url" id="gisUrl" placeholder="https://2gis.ru/...">
 
-    btn.disabled = true;
-    btn.innerText = 'Сохранение в Gist...';
+    <div class="channels-card">
+      <div class="channels-header">
+        <span class="channels-title">Куда слать негатив</span>
+        <span class="channels-hint">Заполните нужные</span>
+      </div>
 
-    try {
-      const getRes = await fetch(`https://api.github.com/gists/${gistId}`, {
-        headers: { 'Authorization': `token ${token}` }
-      });
-      
-      if (!getRes.ok) throw new Error('Bad credentials');
-      
-      const gistData = await getRes.json();
-      let shops = JSON.parse(gistData.files['shops.json'].content || '{}');
+      <label>Telegram (Chat ID)</label>
+      <input type="text" id="targetTg" placeholder="Например: 423133556">
 
-      shops[shopId] = {
-        name: name,
-        yandex_url: yandexUrl || null,
-        gis_url: gisUrl || null,
-        maps_url: yandexUrl || gisUrl || null, // обратная совместимость
-        targets: {
-          telegram: targetTg || null,
-          vk: targetVk || null,
-          email: targetEmail || null
-        }
-      };
+      <label>ВКонтакте (VK User ID)</label>
+      <input type="text" id="targetVk" placeholder="Например: 74829102">
 
-      const patchRes = await fetch(`https://api.github.com/gists/${gistId}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `token ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          files: { 'shops.json': { content: JSON.stringify(shops, null, 2) } }
-        })
-      });
+      <label>Электронная почта (Email)</label>
+      <input type="email" id="targetEmail" placeholder="director@company.ru">
+    </div>
 
-      if (patchRes.ok) {
-        const qrUrl = `https://servis-kontrol.ru/?id=${shopId}`;
-        
-        showMessage(`
-          <div style="font-weight: 700; color: #34d399; margin-bottom: 4px;">✓ Стойка №${shopId} сохранена!</div>
-          <div style="font-size: 11px; color: #94a3b8; margin-bottom: 6px;">Адрес для кодирования в QR-код:</div>
-          <div class="link-container">
-            <a href="${qrUrl}" target="_blank" class="link-text">${qrUrl}</a>
-            <button type="button" class="btn-copy" onclick="copyLink('${qrUrl}', this)">Копировать</button>
-          </div>
-        `, true);
+    <button class="btn-submit" id="btnSave" onclick="saveShop()">Привязать стойку</button>
+    <div id="statusBox" class="status-box"></div>
+  </div>
 
-        document.getElementById('shopId').value = '';
-        document.getElementById('shopName').value = '';
-        document.getElementById('yandexUrl').value = '';
-        document.getElementById('gisUrl').value = '';
-        document.getElementById('targetTg').value = '';
-        document.getElementById('targetVk').value = '';
-        document.getElementById('targetEmail').value = '';
-      } else {
-        showMessage('Ошибка сохранения: проверьте права токена GitHub', false);
+
+  <script>
+    // Проверка сохранённой сессии при открытии
+    async function initSecurity() {
+      const token = localStorage.getItem('sk_admin_token') || sessionStorage.getItem('sk_admin_token');
+
+      if (!token) {
+        showLoginScreen();
+        return;
       }
-    } catch (e) {
-      showMessage('Ошибка доступа к Gist. Проверьте токен и Gist ID', false);
-    } finally {
-      btn.disabled = false;
-      btn.innerText = 'Привязать стойку';
+
+      // Проверяем токен сессии на сервере Vercel
+      try {
+        const res = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: token })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          showAdminPanel();
+        } else {
+          logoutAdmin();
+        }
+      } catch (err) {
+        showLoginScreen();
+      }
     }
-  }
 
-  function showMessage(htmlContent, isSuccess) {
-    const el = document.getElementById('statusBox');
-    el.className = `status-box ${isSuccess ? 'status-ok' : 'status-err'}`;
-    el.innerHTML = htmlContent;
-    el.style.display = 'block';
-  }
+    // Проверка введенного пароля через /api/auth
+    async function checkAuth() {
+      const pass = document.getElementById('adminPassInput').value.trim();
+      const remember = document.getElementById('rememberMe').checked;
+      const errBox = document.getElementById('authError');
+      const btn = document.getElementById('btnAuth');
 
-  function copyLink(url, btnElement) {
-    navigator.clipboard.writeText(url).then(() => {
-      btnElement.innerText = 'Скопировано!';
-      setTimeout(() => {
-        btnElement.innerText = 'Копировать';
-      }, 2000);
-    });
-  }
-</script>
+      if (!pass) return;
 
+      btn.disabled = true;
+      btn.innerText = 'Проверка...';
+      errBox.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pass })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          const storage = remember ? localStorage : sessionStorage;
+          storage.setItem('sk_admin_token', data.token);
+          showAdminPanel();
+        } else {
+          errBox.innerText = data.error || 'Неверный пароль!';
+          errBox.style.display = 'block';
+          document.getElementById('adminPassInput').value = '';
+          document.getElementById('adminPassInput').focus();
+        }
+      } catch (err) {
+        errBox.innerText = 'Сетевая ошибка при проверке';
+        errBox.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Войти в управление';
+      }
+    }
+
+    function showLoginScreen() {
+      document.getElementById('authCard').style.display = 'block';
+      document.getElementById('mainAdminCard').style.display = 'none';
+      document.getElementById('adminPassInput').focus();
+    }
+
+    function showAdminPanel() {
+      document.getElementById('authCard').style.display = 'none';
+      document.getElementById('mainAdminCard').style.display = 'block';
+
+      // Автозаполнение токенов Gist из личного браузера
+      document.getElementById('gistId').value = localStorage.getItem('cfg_gist_id') || '';
+      document.getElementById('ghToken').value = localStorage.getItem('cfg_gh_token') || '';
+    }
+
+    function logoutAdmin() {
+      localStorage.removeItem('sk_admin_token');
+      sessionStorage.removeItem('sk_admin_token');
+      showLoginScreen();
+    }
+
+    // Сохранение стойки в Gist
+    async function saveShop() {
+      const status = document.getElementById('statusBox');
+      const btn = document.getElementById('btnSave');
+      status.style.display = 'none';
+
+      const gistId = document.getElementById('gistId').value.trim();
+      const token = document.getElementById('ghToken').value.trim();
+      const shopId = document.getElementById('shopId').value.trim();
+      const name = document.getElementById('shopName').value.trim();
+      const yandexUrl = document.getElementById('yandexUrl').value.trim();
+      const gisUrl = document.getElementById('gisUrl').value.trim();
+
+      const targetTg = document.getElementById('targetTg').value.trim();
+      const targetVk = document.getElementById('targetVk').value.trim();
+      const targetEmail = document.getElementById('targetEmail').value.trim();
+
+      if (!gistId || !token || !shopId || !name) {
+        showMessage('Заполните номер и название точки, а также Gist ID и токен!', false);
+        return;
+      }
+
+      if (!yandexUrl && !gisUrl) {
+        showMessage('Укажите хотя бы одну ссылку на карты (Яндекс или 2ГИС)!', false);
+        return;
+      }
+
+      if (!targetTg && !targetVk && !targetEmail) {
+        showMessage('Укажите хотя бы один канал (Telegram, VK или Email)!', false);
+        return;
+      }
+
+      localStorage.setItem('cfg_gist_id', gistId);
+      localStorage.setItem('cfg_gh_token', token);
+
+      btn.disabled = true;
+      btn.innerText = 'Сохранение в Gist...';
+
+      try {
+        const getRes = await fetch(`https://api.github.com/gists/${gistId}`, {
+          headers: { 
+            'Authorization': `token ${token}`,
+            'User-Agent': 'ServisKontrol-Admin'
+          }
+        });
+        
+        if (!getRes.ok) throw new Error('Bad credentials');
+        
+        const gistData = await getRes.json();
+        let shops = JSON.parse(gistData.files['shops.json']?.content || '{}');
+
+        // Сохраняем в структуре, строго синхронной с send.js
+        shops[shopId] = {
+          name: name,
+          yandex_url: yandexUrl || null,
+          gis_url: gisUrl || null,
+          maps_url: yandexUrl || gisUrl || null,
+          targets: {
+            telegram: targetTg || null,
+            vk: targetVk || null,
+            email: targetEmail || null
+          }
+        };
+
+        const patchRes = await fetch(`https://api.github.com/gists/${gistId}`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Content-Type': 'application/json',
+            'User-Agent': 'ServisKontrol-Admin'
+          },
+          body: JSON.stringify({
+            files: { 'shops.json': { content: JSON.stringify(shops, null, 2) } }
+          })
+        });
+
+        if (patchRes.ok) {
+          const qrUrl = `https://servis-kontrol.ru/?id=${shopId}`;
+          
+          showMessage(`
+            <div style="font-weight: 700; color: #34d399; margin-bottom: 4px;">✓ Стойка №${shopId} сохранена!</div>
+            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 6px;">Адрес для кодирования в QR-код:</div>
+            <div class="link-container">
+              <a href="${qrUrl}" target="_blank" class="link-text">${qrUrl}</a>
+              <button type="button" class="btn-copy" onclick="copyLink('${qrUrl}', this)">Копировать</button>
+            </div>
+          `, true);
+
+          document.getElementById('shopId').value = '';
+          document.getElementById('shopName').value = '';
+          document.getElementById('yandexUrl').value = '';
+          document.getElementById('gisUrl').value = '';
+          document.getElementById('targetTg').value = '';
+          document.getElementById('targetVk').value = '';
+          document.getElementById('targetEmail').value = '';
+        } else {
+          showMessage('Ошибка сохранения: проверьте права токена GitHub', false);
+        }
+      } catch (e) {
+        showMessage('Ошибка доступа к Gist. Проверьте токен и Gist ID', false);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Привязать стойку';
+      }
+    }
+
+    function showMessage(htmlContent, isSuccess) {
+      const el = document.getElementById('statusBox');
+      el.className = `status-box ${isSuccess ? 'status-ok' : 'status-err'}`;
+      el.innerHTML = htmlContent;
+      el.style.display = 'block';
+    }
+
+    function copyLink(url, btnElement) {
+      navigator.clipboard.writeText(url).then(() => {
+        btnElement.innerText = 'Скопировано!';
+        setTimeout(() => {
+          btnElement.innerText = 'Копировать';
+        }, 2000);
+      });
+    }
+
+    initSecurity();
+  </script>
 </body>
 </html>
