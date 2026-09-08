@@ -3,257 +3,307 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Печать QR-стойки контроля качества</title>
+  <title>Макет стойки контроля сервиса</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
-    :root {
-      --bg: #0f172a;
-      --card-bg: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --accent: #0284c7;
-      --border: #e2e8f0;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     body {
-      background-color: var(--bg);
+      background-color: #0b0f19;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 30px 16px;
-      color: #fff;
+      color: #f8fafc;
     }
 
-    /* Панель управления перед печатью */
+    /* Панель настроек перед экспортом/печатью */
     .controls-panel {
-      background: #1e293b;
+      background: #161e2e;
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 20px;
+      border-radius: 18px;
+      padding: 22px;
       width: 100%;
       max-width: 440px;
       margin-bottom: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     }
 
     .controls-panel label {
       display: block;
       font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
       color: #94a3b8;
       margin-bottom: 6px;
-      font-weight: 600;
+      font-weight: 700;
     }
 
-    .controls-panel input {
+    .controls-panel input, .controls-panel select {
       width: 100%;
-      background: #0f172a;
+      background: #0b0f19;
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 10px;
-      padding: 10px 12px;
+      padding: 11px 14px;
       font-size: 14px;
       color: #fff;
       outline: none;
       margin-bottom: 14px;
     }
 
-    .controls-panel input:focus {
-      border-color: #38bdf8;
-    }
-
     .btn-print {
       width: 100%;
-      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-      color: #0f172a;
+      background: #fff;
+      color: #0b0f19;
       border: none;
       padding: 14px;
       border-radius: 10px;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      transition: transform 0.2s ease;
+      transition: all 0.2s ease;
     }
 
     .btn-print:hover {
+      background: #e2e8f0;
       transform: translateY(-1px);
     }
 
-    /* Макет полиграфии (А6: 105 x 148 мм) */
+    /* ФИЗИЧЕСКИЙ БЛАНК СТОЙКИ (100 x 150 мм — стандарт 10x15 см) */
     .stand-card {
-      background: var(--card-bg);
-      color: var(--text-main);
-      width: 105mm;
-      height: 148mm;
-      padding: 12mm 10mm;
-      border-radius: 6px;
+      width: 100mm;
+      height: 150mm;
+      padding: 14mm 10mm 10mm 10mm;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
       text-align: center;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
       position: relative;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
     }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 12px;
-      background: #f0f9ff;
-      border: 1px solid #bae6fd;
-      color: var(--accent);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      border-radius: 99px;
+    /* ТЕМА 1: Белый акрил / премиум бумага */
+    .theme-white {
+      background: #ffffff;
+      color: #090d16;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    }
+    .theme-white .stars { color: #f59e0b; }
+    .theme-white .sub-text { color: #64748b; }
+    .theme-white .footer-id { color: #94a3b8; }
+    .theme-white .qr-container { background: #ffffff; }
+
+    /* ТЕМА 2: Матовый черный акрил */
+    .theme-black {
+      background: #11141a;
+      color: #ffffff;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .theme-black .stars { color: #fbbf24; }
+    .theme-black .sub-text { color: #94a3b8; }
+    .theme-black .footer-id { color: #475569; }
+    .theme-black .qr-container { 
+      background: #ffffff; 
+      padding: 8px;
+      border-radius: 14px;
     }
 
-    .title {
+    /* ТЕМА 3: Под лазерную гравировку (чистый монохром) */
+    .theme-engrave {
+      background: #ffffff;
+      color: #000000;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+    }
+    .theme-engrave .stars { color: #000000; }
+    .theme-engrave .sub-text { color: #000000; }
+    .theme-engrave .footer-id { color: #000000; }
+    .theme-engrave .qr-container { background: transparent; }
+    .theme-engrave .logo-badge { filter: grayscale(1) contrast(200%); }
+
+    /* Типографика стойки */
+    .stars {
+      font-size: 17px;
+      letter-spacing: 5px;
+      margin-bottom: 10px;
+    }
+
+    .main-title {
       font-size: 20px;
       font-weight: 800;
+      letter-spacing: -0.4px;
       line-height: 1.25;
-      margin-top: 8px;
-      color: #0f172a;
+      text-transform: uppercase;
     }
 
-    .subtitle {
-      font-size: 12px;
-      color: var(--text-muted);
-      line-height: 1.4;
+    .sub-text {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
       margin-top: 6px;
-      max-width: 90%;
     }
 
-    /* Контейнер QR-кода */
-    .qr-frame {
-      padding: 12px;
-      background: #ffffff;
-      border: 2px dashed #cbd5e1;
-      border-radius: 16px;
+    /* QR блок */
+    .qr-container {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 8px 0;
+      margin: 10px 0;
     }
 
-    .scan-hint {
-      font-size: 12px;
-      font-weight: 700;
-      color: #0284c7;
+    /* Зона логотипов Яндекс и 2ГИС */
+    .logos-row {
       display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .logo-badge {
+      display: inline-flex;
       align-items: center;
       gap: 6px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(125, 125, 125, 0.08);
+      border: 1px solid rgba(125, 125, 125, 0.15);
     }
 
-    .footer {
-      border-top: 1px solid var(--border);
-      width: 100%;
-      padding-top: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 10px;
-      color: #94a3b8;
+    .footer-id {
+      font-size: 9px;
       font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      width: 100%;
+      text-align: center;
     }
 
-    /* Настройки прямой печати и PDF */
+    /* Прямая печать */
     @media print {
       body {
         background: transparent !important;
         padding: 0 !important;
       }
-
       .no-print {
         display: none !important;
       }
-
       .stand-card {
         box-shadow: none !important;
-        border: 1px solid #e2e8f0;
-        page-break-inside: avoid;
+        border: none !important;
         margin: 0 auto;
+        page-break-inside: avoid;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Блок ввода данных (скрывается при печати) -->
+  <!-- Блок управления -->
   <div class="controls-panel no-print">
+    <label>Тема стойки</label>
+    <select id="themeSelect" onchange="changeTheme(this.value)">
+      <option value="theme-white">Светлый минимализм (Белый акрил / бумага)</option>
+      <option value="theme-black">Черный премиум (Матовый акрил)</option>
+      <option value="theme-engrave">Монохром (Для лазерной гравировки по дереву)</option>
+    </select>
+
     <label>Номер стойки (ID)</label>
     <input type="text" id="inId" value="001" oninput="updateCard()">
-
-    <label>Название заведения</label>
-    <input type="text" id="inName" value="Кофейня «Утро»" oninput="updateCard()">
 
     <button class="btn-print" onclick="window.print()">Распечатать / Сохранить в PDF</button>
   </div>
 
-  <!-- Печатный бланк стойки (A6) -->
-  <div class="stand-card">
+  <!-- Печатный макет 10x15 см -->
+  <div class="stand-card theme-white" id="standCard">
+    
+    <!-- Шапка -->
     <div>
-      <div class="badge">Контроль качества</div>
-      <div class="title" id="cardName">Кофейня «Утро»</div>
-      <div class="subtitle">Есть замечания по обслуживанию или чистоте? Напишите прямо сейчас!</div>
+      <div class="stars">★★★★★</div>
+      <div class="main-title">Оцените<br>наш сервис</div>
+      <div class="sub-text">Поделитесь впечатлениями о визите</div>
     </div>
 
-    <div class="qr-frame">
+    <!-- QR Код -->
+    <div class="qr-container">
       <div id="qrcode"></div>
     </div>
 
+    <!-- Блок логотипов доверия -->
     <div>
-      <div class="scan-hint">
-        <span>📷</span> Наведите камеру смартфона
+      <div class="sub-text" style="margin-bottom: 8px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">
+        Наведите камеру смартфона
       </div>
-      <div style="font-size: 10px; color: #64748b; margin-top: 4px;">
-        Ваш отзыв поступает напрямую руководству
+      
+      <div class="logos-row">
+        <!-- Яндекс Карты SVG -->
+        <div class="logo-badge">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <rect width="24" height="24" rx="12" fill="#FC3F1D"/>
+            <path d="M13.5 6.5H11.8C9.9 6.5 8.7 7.7 8.7 9.4C8.7 10.8 9.5 11.8 10.7 12.3L8.5 17.5H10.8L12.7 13H13.6V17.5H15.5V6.5H13.5ZM11.8 11.2C10.9 11.2 10.4 10.5 10.4 9.5C10.4 8.5 11 7.9 11.8 7.9H13.6V11.2H11.8Z" fill="white"/>
+          </svg>
+          Яндекс Карты
+        </div>
+
+        <!-- 2ГИС SVG -->
+        <div class="logo-badge">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <rect width="24" height="24" rx="6" fill="#00A651"/>
+            <path d="M6 7H13C14.7 7 16 8.3 16 10C16 11.7 14.7 13 13 13H8.5V17H6V7ZM8.5 11H13C13.6 11 14 10.6 14 10C14 9.4 13.6 9 13 9H8.5V11Z" fill="white"/>
+            <circle cx="17.5" cy="16.5" r="1.5" fill="white"/>
+          </svg>
+          2ГИС
+        </div>
       </div>
     </div>
 
-    <div class="footer">
-      <span>servis-kontrol.ru</span>
-      <span id="cardId">Точка #001</span>
-    </div>
+    <!-- Номер точки -->
+    <div class="footer-id" id="cardId">ID: 001</div>
   </div>
 
   <script>
-    let qrInstance = null;
+    let currentTheme = 'theme-white';
+
+    function changeTheme(themeName) {
+      currentTheme = themeName;
+      const card = document.getElementById('standCard');
+      card.className = `stand-card ${themeName}`;
+      updateCard();
+    }
 
     function updateCard() {
       const id = document.getElementById('inId').value.trim() || '001';
-      const name = document.getElementById('inName').value.trim() || 'Наше заведение';
-
-      document.getElementById('cardName').innerText = name;
-      document.getElementById('cardId').innerText = `Точка #${id}`;
+      document.getElementById('cardId').innerText = `№ ${id}`;
 
       const targetUrl = `https://servis-kontrol.ru/?id=${encodeURIComponent(id)}`;
-
-      // Пересоздаем QR-код
       const qrBox = document.getElementById('qrcode');
       qrBox.innerHTML = '';
 
-      qrInstance = new QRCode(qrBox, {
+      // Настройка цвета пикселей под тему
+      const isBlackTheme = currentTheme === 'theme-black';
+
+      new QRCode(qrBox, {
         text: targetUrl,
-        width: 170,
-        height: 170,
-        colorDark: "#090d16",
+        width: 175,
+        height: 175,
+        colorDark: "#000000",
         colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H // Высокая избыточность (читается даже при повреждениях/бликах)
+        correctLevel: QRCode.CorrectLevel.H
       });
     }
 
-    // Первичная генерация
     updateCard();
   </script>
 </body>
