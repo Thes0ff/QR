@@ -1,11 +1,10 @@
 // =========================================================================
-// НАСТРОЙКИ ТОКЕНОВ (из Environment Variables Vercel или укажите строкой):
+// ПЕРЕМЕННЫЕ ОКРУЖЕНИЯ VERCEL (названия строго по вашему скриншоту):
 // =========================================================================
-const GIST_ID = "052f7c277f6e1fc78a305e81e2135f65";
-
-const RESEND_API_KEY = process.env.RESEND_API_KEY || "re_ВАШ_КЛЮЧ_RESEND";
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "ВАШ_ТОКЕН_ТЕЛЕГРАМ_БОТА";
-const VK_ACCESS_TOKEN = process.env.VK_ACCESS_TOKEN || process.env.VK_TOKEN || "ВАШ_ТОКЕН_СООБЩЕСТВА_ВК";
+const GIST_ID = process.env.GIST_ID || "052f7c277f6e1fc78a305e81e2135f65";
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const TG_BOT_TOKEN = process.env.TG_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
+const VK_GROUP_TOKEN = process.env.VK_GROUP_TOKEN || process.env.VK_ACCESS_TOKEN;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -17,7 +16,7 @@ export default async function handler(req, res) {
     const { shopId = '001', rating = 1, tags = [], comment = '', phone = '' } = body;
     const cleanShopId = String(shopId).trim();
 
-    // 1. Читаем актуальные контакты точки из Gist (с обязательным User-Agent!)
+    // 1. Читаем контакты точки из Gist
     let shopName = `Точка #${cleanShopId}`;
     let targetEmail = null;
     let targetTg = null;
@@ -26,7 +25,7 @@ export default async function handler(req, res) {
     try {
       const gistRes = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
         headers: {
-          'User-Agent': 'ServisKontrol-Serverless-App',
+          'User-Agent': 'ServisKontrol-App',
           'Accept': 'application/vnd.github.v3+json'
         }
       });
@@ -38,24 +37,26 @@ export default async function handler(req, res) {
 
         if (shop) {
           shopName = shop.name || shopName;
-          // Ищем контакты по любым возможным ключам из админки
-          targetEmail = shop.email || shop.admin_email || shop.mail || null;
-          targetTg = shop.telegram || shop.tg_chat_id || shop.tg || shop.chat_id || null;
-          targetVk = shop.vk || shop.vk_user_id || shop.vk_id || null;
+
+          // Читаем из targets (как сохраняет admin.html):
+          const targets = shop.targets || {};
+          targetEmail = targets.email || shop.email || null;
+          targetTg    = targets.telegram || targets.tg || shop.telegram || null;
+          targetVk    = targets.vk || shop.vk || null;
         } else {
-          console.warn(`Точка с ID ${cleanShopId} не найдена в shops.json`);
+          console.warn(`[Shop ${cleanShopId}] Не найдена в shops.json. Доступные ID:`, Object.keys(shops));
         }
       } else {
-        console.error(`Ошибка ответа GitHub Gist: ${gistRes.status} ${gistRes.statusText}`);
+        console.error(`Ошибка загрузки Gist: HTTP ${gistRes.status}`);
       }
     } catch (err) {
-      console.error('Ошибка загрузки Gist:', err.message);
+      console.error('Ошибка при обращении к Gist:', err.message);
     }
 
-    // Если в настройках точки почта не была задана, используем резервную
+    // Если у заведения не был заполнен email в админке, используем запасной
     const finalEmail = targetEmail || 'FuldOne007@yandex.ru';
 
-    // 2. Подготовка текста
+    // 2. Оформление текста обращения
     const score = Math.max(1, Math.min(5, Number(rating) || 1));
     const starIcons = '★'.repeat(score) + '☆'.repeat(5 - score);
     const scoreColor = score <= 2 ? '#fda4af' : (score === 3 ? '#fbbf24' : '#38bdf8');
@@ -74,8 +75,8 @@ export default async function handler(req, res) {
     // 3. Отправка во все указанные каналы (параллельно)
     const sendTasks = [];
 
-    // --- А. TELEGRAM ---
-    if (targetTg && TELEGRAM_BOT_TOKEN && !TELEGRAM_BOT_TOKEN.includes('ВАШ_')) {
+    // --- А. TELEGRAM (по TG_BOT_TOKEN) ---
+    if (targetTg && TG_BOT_TOKEN) {
       const tgHtml = 
 `🔔 <b>Новое обращение с кассы!</b>
 🏢 <b>Заведение:</b> ${shopName} (Стойка № ${cleanShopId})
@@ -89,38 +90,55 @@ ${comment ? `<i>«${comment}»</i>` : '<i>Без комментария</i>'}
 📞 <b>Телефон:</b> ${phone ? `<code>${phone}</code>` : '<i>Не указан</i>'}`;
 
       sendTasks.push(
-        fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            chat_id: targetTg,
+            chat_id: String(targetTg).trim(),
             text: tgHtml,
             parse_mode: 'HTML'
           })
-        }).then(r => r.json()).then(data => ({ channel: 'telegram', data }))
+        })
+        .then(async (r) => {
+          const resJson = await r.json();
+          if (!resJson.ok) {
+            console.error('[Telegram Error]', resJson);
+            throw new Error(`TG error: ${resJson.description}`);
+          }
+          return { channel: 'telegram', success: true };
+        })
       );
     }
 
-    // --- Б. ВКОНТАКТЕ ---
-    if (targetVk && VK_ACCESS_TOKEN && !VK_ACCESS_TOKEN.includes('ВАШ_')) {
+    // --- Б. ВКОНТАКТЕ (по VK_GROUP_TOKEN) ---
+    if (targetVk && VK_GROUP_TOKEN) {
+      const cleanVkId = String(targetVk).replace(/\D/g, '');
       const vkParams = new URLSearchParams({
-        user_id: String(targetVk).replace(/\D/g, ''),
+        user_id: cleanVkId,
         random_id: String(Date.now() + Math.floor(Math.random() * 1000)),
         message: plainText,
         v: '5.131',
-        access_token: VK_ACCESS_TOKEN
+        access_token: VK_GROUP_TOKEN
       });
 
       sendTasks.push(
         fetch('https://api.vk.com/method/messages.send', {
           method: 'POST',
           body: vkParams
-        }).then(r => r.json()).then(data => ({ channel: 'vk', data }))
+        })
+        .then(async (r) => {
+          const resJson = await r.json();
+          if (resJson.error) {
+            console.error('[VK Error]', resJson.error);
+            throw new Error(`VK error: ${resJson.error.error_msg}`);
+          }
+          return { channel: 'vk', success: true };
+        })
       );
     }
 
-    // --- В. ЭЛЕКТРОННАЯ ПОЧТА (RESEND) ---
-    if (finalEmail && RESEND_API_KEY && !RESEND_API_KEY.includes('ВАШ_')) {
+    // --- В. EMAIL (по RESEND_API_KEY) ---
+    if (finalEmail && RESEND_API_KEY) {
       const tagsHtml = tags.length > 0 
         ? tags.map(t => `<span style="display:inline-block;background-color:rgba(244,63,94,0.15);border:1px solid rgba(244,63,94,0.35);color:#fda4af;font-size:12px;font-weight:600;padding:4px 10px;border-radius:8px;margin:0 4px 6px 0;">${t}</span>`).join('')
         : '<span style="color:#64748b;font-size:13px;">Замечания не выбраны</span>';
@@ -207,11 +225,18 @@ ${comment ? `<i>«${comment}»</i>` : '<i>Без комментария</i>'}
             text: plainText,
             html: emailHtml
           })
-        }).then(r => r.json()).then(data => ({ channel: 'email', data }))
+        })
+        .then(async (r) => {
+          const resJson = await r.json();
+          if (!r.ok) {
+            console.error('[Resend Error]', resJson);
+            throw new Error(`Resend error: ${resJson.message}`);
+          }
+          return { channel: 'email', success: true };
+        })
       );
     }
 
-    // Выполняем параллельную рассылку по всем активным каналам
     const results = await Promise.allSettled(sendTasks);
 
     return res.status(200).json({
@@ -226,7 +251,7 @@ ${comment ? `<i>«${comment}»</i>` : '<i>Без комментария</i>'}
     });
 
   } catch (error) {
-    console.error('Ошибка в обработчике send.js:', error);
+    console.error('Критическая ошибка send.js:', error);
     return res.status(500).json({ error: error.message || 'Ошибка сервера' });
   }
 }
