@@ -136,8 +136,7 @@
       transition: width 0.2s ease, height 0.2s ease;
     }
 
-    /* ================= СТРОГИЕ МЕТРИЧЕСКИЕ РАЗМЕРЫ ================= */
-    /* А6 (105 × 148 мм — стандарт настольных рамок и стоек) */
+    /* ФОРМАТЫ */
     .format-a6 {
       width: 105mm;
       height: 148mm;
@@ -147,12 +146,11 @@
     .format-a6 .sub-text { font-size: 11.5px; }
     .format-a6 .stars-box { font-size: 20px; letter-spacing: 4px; margin-bottom: 6px; }
     .format-a6 .hint-label { font-size: 9.5px; margin-bottom: 6px; }
-    .format-a6 .badge-card { font-size: 10px; padding: 4px 8px; gap: 5px; }
-    .format-a6 .badge-card svg { width: 13px; height: 13px; }
+    .format-a6 .badge-card { font-size: 10px; padding: 4px 8px; gap: 6px; border-radius: 6px; }
+    .format-a6 .badge-card svg { width: 14px; height: 14px; }
     .format-a6 .footer-text { font-size: 9px; }
     .format-a6 .qr-wrapper { padding: 9px; border-radius: 14px; margin: 1.5mm 0; }
 
-    /* А5 (148 × 210 мм) */
     .format-a5 {
       width: 148mm;
       height: 210mm;
@@ -163,11 +161,10 @@
     .format-a5 .stars-box { font-size: 28px; letter-spacing: 6px; margin-bottom: 12px; }
     .format-a5 .hint-label { font-size: 13px; margin-bottom: 8px; }
     .format-a5 .badge-card { font-size: 13px; padding: 6px 12px; gap: 7px; border-radius: 8px; }
-    .format-a5 .badge-card svg { width: 17px; height: 17px; }
+    .format-a5 .badge-card svg { width: 18px; height: 18px; }
     .format-a5 .footer-text { font-size: 12px; }
     .format-a5 .qr-wrapper { padding: 14px; border-radius: 18px; margin: 3mm 0; }
 
-    /* А4 (210 × 297 мм) */
     .format-a4 {
       width: 210mm;
       height: 297mm;
@@ -182,7 +179,6 @@
     .format-a4 .footer-text { font-size: 16px; }
     .format-a4 .qr-wrapper { padding: 18px; border-radius: 24px; margin: 5mm 0; }
 
-    /* А3 (297 × 420 мм) */
     .format-a3 {
       width: 297mm;
       height: 420mm;
@@ -197,7 +193,7 @@
     .format-a3 .footer-text { font-size: 22px; }
     .format-a3 .qr-wrapper { padding: 24px; border-radius: 32px; margin: 8mm 0; }
 
-    /* ================= ПРЕСЕТЫ ================= */
+    /* ПРЕСЕТЫ */
     .preset-black { background: #000000 !important; }
     .preset-white { background: #ffffff !important; }
     .preset-kraft {
@@ -333,7 +329,6 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
-    /* ================= ПЕЧАТЬ БЕЗ ПОЛЕЙ И ОВЕРФЛОУ ================= */
     @media print {
       @page {
         margin: 0 !important;
@@ -443,11 +438,23 @@
               </svg>
               Яндекс Карты
             </div>
+            
             <div class="badge-card">
               <svg viewBox="0 0 24 24" fill="none">
-                <rect width="24" height="24" rx="6" fill="#00A651"/>
-                <path d="M6 7H13C14.7 7 16 8.3 16 10C16 11.7 14.7 13 13 13H8.5V17H6V7ZM8.5 11H13C13.6 11 14 10.6 14 10C14 9.4 13.6 9 13 9H8.5V11Z" fill="white"/>
-                <circle cx="17.5" cy="16.5" r="1.5" fill="white"/>
+                <defs>
+                  <clipPath id="twogis-clip">
+                    <rect width="24" height="24" rx="6" />
+                  </clipPath>
+                </defs>
+                <g clip-path="url(#twogis-clip)">
+                  <rect width="24" height="24" fill="#189e28" />
+                  <path d="M-1 -1 H25 V8.5 L-1 5 Z" fill="#f59f1c" />
+                  <line x1="-1" y1="5" x2="25" y2="8.5" stroke="#ffffff" stroke-width="1.2" />
+                  <path d="M-1 19 L25 16.5 V25 H-1 Z" fill="#89cf26" />
+                  <line x1="-1" y1="19" x2="25" y2="16.5" stroke="#ffffff" stroke-width="1.2" />
+                  <path d="M12 4.8 A 5.3 5.3 0 0 1 17.2 12.2 A 2.2 2.2 0 0 0 13.5 14.2 V 18.5 H 10.5 V 14.2 A 2.2 2.2 0 0 0 6.8 12.2 A 5.3 5.3 0 0 1 12 4.8 Z" 
+                        stroke="#ffffff" stroke-width="1.8" stroke-linejoin="round" fill="#0b75f5" />
+                </g>
               </svg>
               2ГИС
             </div>
