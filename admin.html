@@ -203,10 +203,6 @@
       word-break: break-all;
     }
 
-    .link-text:hover {
-      text-decoration: underline;
-    }
-
     .btn-copy {
       background: rgba(56, 189, 248, 0.15);
       border: 1px solid rgba(56, 189, 248, 0.3);
@@ -218,10 +214,6 @@
       cursor: pointer;
       white-space: nowrap;
       transition: all 0.2s ease;
-    }
-
-    .btn-copy:hover {
-      background: rgba(56, 189, 248, 0.3);
     }
   </style>
 </head>
@@ -247,8 +239,11 @@
   <label>Название точки</label>
   <input type="text" id="shopName" placeholder="Кофейня «Утро»">
 
-  <label>Ссылка на Яндекс.Карты / 2ГИС</label>
-  <input type="url" id="mapsUrl" placeholder="https://yandex.ru/maps/-/... ">
+  <label>Ссылка на Яндекс.Карты</label>
+  <input type="url" id="yandexUrl" placeholder="https://yandex.ru/maps/org/...">
+
+  <label>Ссылка на 2ГИС</label>
+  <input type="url" id="gisUrl" placeholder="https://2gis.ru/...">
 
   <div class="channels-card">
     <div class="channels-header">
@@ -271,7 +266,6 @@
 </div>
 
 <script>
-  // Восстанавливаем сохраненные токены
   document.getElementById('gistId').value = localStorage.getItem('cfg_gist_id') || '';
   document.getElementById('ghToken').value = localStorage.getItem('cfg_gh_token') || '';
 
@@ -284,14 +278,20 @@
     const token = document.getElementById('ghToken').value.trim();
     const shopId = document.getElementById('shopId').value.trim();
     const name = document.getElementById('shopName').value.trim();
-    const mapsUrl = document.getElementById('mapsUrl').value.trim();
+    const yandexUrl = document.getElementById('yandexUrl').value.trim();
+    const gisUrl = document.getElementById('gisUrl').value.trim();
 
     const targetTg = document.getElementById('targetTg').value.trim();
     const targetVk = document.getElementById('targetVk').value.trim();
     const targetEmail = document.getElementById('targetEmail').value.trim();
 
-    if (!gistId || !token || !shopId || !name || !mapsUrl) {
-      showMessage('Заполните все основные поля стойки!', false);
+    if (!gistId || !token || !shopId || !name) {
+      showMessage('Заполните номер и название точки!', false);
+      return;
+    }
+
+    if (!yandexUrl && !gisUrl) {
+      showMessage('Укажите хотя бы одну ссылку на карты (Яндекс или 2ГИС)!', false);
       return;
     }
 
@@ -318,7 +318,9 @@
 
       shops[shopId] = {
         name: name,
-        maps_url: mapsUrl,
+        yandex_url: yandexUrl || null,
+        gis_url: gisUrl || null,
+        maps_url: yandexUrl || gisUrl || null, // обратная совместимость
         targets: {
           telegram: targetTg || null,
           vk: targetVk || null,
@@ -341,7 +343,7 @@
         const qrUrl = `https://servis-kontrol.ru/?id=${shopId}`;
         
         showMessage(`
-          <div style="font-weight: 700; color: #34d399; margin-bottom: 4px;">✓ Стойка №${shopId} привязана!</div>
+          <div style="font-weight: 700; color: #34d399; margin-bottom: 4px;">✓ Стойка №${shopId} сохранена!</div>
           <div style="font-size: 11px; color: #94a3b8; margin-bottom: 6px;">Адрес для кодирования в QR-код:</div>
           <div class="link-container">
             <a href="${qrUrl}" target="_blank" class="link-text">${qrUrl}</a>
@@ -349,10 +351,10 @@
           </div>
         `, true);
 
-        // Очищаем поля формы для следующей стойки
         document.getElementById('shopId').value = '';
         document.getElementById('shopName').value = '';
-        document.getElementById('mapsUrl').value = '';
+        document.getElementById('yandexUrl').value = '';
+        document.getElementById('gisUrl').value = '';
         document.getElementById('targetTg').value = '';
         document.getElementById('targetVk').value = '';
         document.getElementById('targetEmail').value = '';
