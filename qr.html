@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Печать QR-стойки контроля качества</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent: #0284c7;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 16px;
+      color: #fff;
+    }
+
+    /* Панель управления перед печатью */
+    .controls-panel {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 440px;
+      margin-bottom: 30px;
+    }
+
+    .controls-panel label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .controls-panel input {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: #fff;
+      outline: none;
+      margin-bottom: 14px;
+    }
+
+    .controls-panel input:focus {
+      border-color: #38bdf8;
+    }
+
+    .btn-print {
+      width: 100%;
+      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+      color: #0f172a;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .btn-print:hover {
+      transform: translateY(-1px);
+    }
+
+    /* Макет полиграфии (А6: 105 x 148 мм) */
+    .stand-card {
+      background: var(--card-bg);
+      color: var(--text-main);
+      width: 105mm;
+      height: 148mm;
+      padding: 12mm 10mm;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      border-radius: 99px;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-top: 8px;
+      color: #0f172a;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-top: 6px;
+      max-width: 90%;
+    }
+
+    /* Контейнер QR-кода */
+    .qr-frame {
+      padding: 12px;
+      background: #ffffff;
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 8px 0;
+    }
+
+    .scan-hint {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0284c7;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .footer {
+      border-top: 1px solid var(--border);
+      width: 100%;
+      padding-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    /* Настройки прямой печати и PDF */
+    @media print {
+      body {
+        background: transparent !important;
+        padding: 0 !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .stand-card {
+        box-shadow: none !important;
+        border: 1px solid #e2e8f0;
+        page-break-inside: avoid;
+        margin: 0 auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Блок ввода данных (скрывается при печати) -->
+  <div class="controls-panel no-print">
+    <label>Номер стойки (ID)</label>
+    <input type="text" id="inId" value="001" oninput="updateCard()">
+
+    <label>Название заведения</label>
+    <input type="text" id="inName" value="Кофейня «Утро»" oninput="updateCard()">
+
+    <button class="btn-print" onclick="window.print()">Распечатать / Сохранить в PDF</button>
+  </div>
+
+  <!-- Печатный бланк стойки (A6) -->
+  <div class="stand-card">
+    <div>
+      <div class="badge">Контроль качества</div>
+      <div class="title" id="cardName">Кофейня «Утро»</div>
+      <div class="subtitle">Есть замечания по обслуживанию или чистоте? Напишите прямо сейчас!</div>
+    </div>
+
+    <div class="qr-frame">
+      <div id="qrcode"></div>
+    </div>
+
+    <div>
+      <div class="scan-hint">
+        <span>📷</span> Наведите камеру смартфона
+      </div>
+      <div style="font-size: 10px; color: #64748b; margin-top: 4px;">
+        Ваш отзыв поступает напрямую руководству
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>servis-kontrol.ru</span>
+      <span id="cardId">Точка #001</span>
+    </div>
+  </div>
+
+  <script>
+    let qrInstance = null;
+
+    function updateCard() {
+      const id = document.getElementById('inId').value.trim() || '001';
+      const name = document.getElementById('inName').value.trim() || 'Наше заведение';
+
+      document.getElementById('cardName').innerText = name;
+      document.getElementById('cardId').innerText = `Точка #${id}`;
+
+      const targetUrl = `https://servis-kontrol.ru/?id=${encodeURIComponent(id)}`;
+
+      // Пересоздаем QR-код
+      const qrBox = document.getElementById('qrcode');
+      qrBox.innerHTML = '';
+
+      qrInstance = new QRCode(qrBox, {
+        text: targetUrl,
+        width: 170,
+        height: 170,
+        colorDark: "#090d16",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H // Высокая избыточность (читается даже при повреждениях/бликах)
+      });
+    }
+
+    // Первичная генерация
+    updateCard();
+  </script>
+</body>
+</html>
