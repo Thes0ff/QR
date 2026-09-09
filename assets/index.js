@@ -1,6 +1,7 @@
 (() => {
   'use strict';
   const { request, safeUrl, validId, message } = SK;
+  const LEGAL_VERSION = '2026-09-09';
   const params = new URLSearchParams(location.search);
   const id = params.get('id');
   const isDemo = !params.has('id');
@@ -27,6 +28,7 @@
     config = shop; $('#widgetLoading').hidden = true; $('#loadError').hidden = true;
     $('#shopName').textContent = isDemo ? 'Как прошёл ваш визит?' : (shop.name || 'Оцените обслуживание');
     $('#widgetEyebrow').textContent = isDemo ? 'Демо-заведение / Обратная связь' : 'Ваше мнение важно';
+    $('#consentRow').hidden = isDemo; $('#privacyConsent').required = !isDemo;
     if (!isDemo) { const title = document.createElement('h1'); title.id = 'shopName'; title.textContent = $('#shopName').textContent; $('#shopName').replaceWith(title); document.title = 'Отзыв: ' + (shop.name || 'Сервис Контроль'); }
     reset();
   }
@@ -59,10 +61,10 @@
     event.preventDefault(); if (sending || rating < 1 || rating > 3 || !config) return;
     message($('#sendError'), ''); const button = $('#btnSend');
     if (isDemo) { $('#successText').textContent = 'Так выглядит подтверждение отправки. Это демо — ваши данные никуда не отправлены.'; $('#successReset').hidden = false; show('successBlock', true); return; }
+    if (!$('#privacyConsent').checked) { message($('#sendError'), 'Подтвердите согласие на обработку данных перед отправкой.'); $('#privacyConsent').focus(); return; }
     sending = true; button.disabled = true; button.textContent = 'Отправляем…'; card.querySelectorAll('.star-btn,.tag-choice').forEach(el => { el.disabled = true; });
     try {
-      const data = await request('/api/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ shopId: id, rating, tags: [...card.querySelectorAll('.tag-choice[aria-pressed=true]')].map(el => el.textContent), comment: $('#comment').value.trim(), phone: $('#phone').value.trim() }) });
-      // The existing API can return HTTP 200 even when every delivery fails.
+      const data = await request('/api/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ shopId: id, rating, tags: [...card.querySelectorAll('.tag-choice[aria-pressed=true]')].map(el => el.textContent), comment: $('#comment').value.trim(), phone: $('#phone').value.trim(), consent: true, consentVersion: LEGAL_VERSION, consentAt: new Date().toISOString() }) });
       if (!data.success || !Array.isArray(data.results) || !data.results.some(result => result.success === true)) throw new Error('Не удалось доставить обращение. Текст сохранён в форме — попробуйте ещё раз или обратитесь к сотруднику.');
       $('#successText').textContent = 'Обращение доставлено в настроенный канал руководства. Спасибо, что помогаете улучшить сервис.'; show('successBlock', true);
     } catch (error) { message($('#sendError'), error.message); }
