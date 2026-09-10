@@ -46,6 +46,21 @@
     }));
   }
 
+  function setupDemoTemplateSelector() {
+    const select = document.getElementById('demoVenueType');
+    if (!select) return;
+    Object.entries(feedbackTemplates).forEach(([key, template]) => {
+      const option = document.createElement('option');
+      option.value = key;
+      option.textContent = template.label;
+      select.append(option);
+    });
+    select.value = config?.feedback_template || 'universal';
+    select.addEventListener('change', () => {
+      configure({ ...config, feedback_template: select.value });
+    });
+  }
+
   function reset() {
     if (sending) return;
     clearTimeout(redirectTimer);
@@ -218,6 +233,7 @@
 
   if (isDemo) {
     configure({ name: 'Демо-заведение', feedback_template: 'universal', yandex_url: 'https://ya.ru', gis_url: 'https://2gis.ru' });
+    setupDemoTemplateSelector();
   } else {
     loadShop();
   }
