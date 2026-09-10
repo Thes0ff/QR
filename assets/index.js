@@ -84,7 +84,6 @@
     $('#shopName').textContent = isDemo ? 'Как прошёл ваш визит?' : (shop.name || 'Оцените обслуживание');
     $('#widgetEyebrow').textContent = isDemo ? 'Демо-заведение / Обратная связь' : 'Ваше мнение важно';
     $('#consentRow').hidden = isDemo;
-    $('#privacyConsent').required = !isDemo;
     renderQuickReplies(shop.feedback_template || 'universal');
     if (!isDemo) {
       const title = document.createElement('h1');
@@ -161,6 +160,10 @@
     button.setAttribute('aria-pressed', String(button.getAttribute('aria-pressed') !== 'true'));
   });
 
+  $('#privacyConsent').addEventListener('change', () => {
+    if ($('#privacyConsent').checked) message($('#sendError'), '');
+  });
+
   card.querySelectorAll('.maps-link').forEach(link => link.addEventListener('click', event => {
     if (isDemo) {
       event.preventDefault();
@@ -180,7 +183,7 @@
       return;
     }
     if (!$('#privacyConsent').checked) {
-      message($('#sendError'), 'Подтвердите согласие на обработку данных перед отправкой.');
+      message($('#sendError'), 'Поставьте галочку согласия на обработку персональных данных, чтобы оставить отзыв.');
       $('#privacyConsent').focus();
       return;
     }
@@ -213,7 +216,7 @@
     } finally {
       sending = false;
       button.disabled = false;
-      button.textContent = 'Отправить руководству';
+      button.textContent = 'Оставить отзыв';
       card.querySelectorAll('.star-btn,.tag-choice').forEach(element => { element.disabled = false; });
     }
   });
